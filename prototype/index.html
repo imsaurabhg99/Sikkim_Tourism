@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>incredible.sikkim — Prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --night: #1d1f4e; --night-deep: #151738; --night-mid: #2b2e6b;
+    --cream: #fdfaf5; --ink: #1d1f4e; --lavender: #cfd0e8;
+    --sun: #f2a154; --coral: #e2622b; --line: #d5d3ce; --muted: #8a8894;
+    --chip: #e9e9f7;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font-family: 'Work Sans', 'Helvetica Neue', sans-serif; }
+  h1, h2, h3, .num { font-family: 'Space Grotesk', sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  .shell { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Header / hero ---------- */
+  .sky { background: var(--night); color: var(--cream); position: relative; overflow: hidden; }
+  .sky svg.backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .sky > .shell { position: relative; }
+  nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; flex-wrap: wrap; }
+  .wordmark { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+  .wordmark span { color: var(--sun); }
+  .pills { display: flex; gap: 6px; background: rgba(253,250,245,0.08); border-radius: 999px; padding: 5px; }
+  .pills a { padding: 9px 20px; border-radius: 999px; font-size: 14px; }
+  .pills a:hover { background: rgba(253,250,245,0.14); }
+  .nav-right { display: flex; gap: 12px; align-items: center; }
+  .currency { display: flex; gap: 2px; background: rgba(253,250,245,0.08); border-radius: 999px; padding: 4px; }
+  .currency button { border: 0; background: transparent; color: var(--cream); font-size: 12.5px; font-weight: 600; border-radius: 999px; padding: 7px 12px; }
+  .currency button.active { background: var(--sun); color: var(--night); }
+  .signin { border: 0; background: var(--cream); color: var(--night); border-radius: 999px; padding: 11px 22px; font-size: 14px; font-weight: 600; }
+  .hero { text-align: center; padding: 52px 0 8px 0; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .hero h1 { font-size: clamp(38px, 5.2vw, 62px); line-height: 1.06; font-weight: 700; margin: 0; max-width: 820px; text-wrap: balance; }
+  .hero p { margin: 0; font-size: 18px; line-height: 1.6; color: var(--lavender); max-width: 620px; }
+
+  /* ---------- Estimator ---------- */
+  .estimator { position: relative; background: var(--cream); color: var(--ink); border-radius: 22px; padding: 24px 26px; margin: 36px auto 0 auto; max-width: 980px; box-shadow: 0 30px 60px rgba(9,10,32,0.45); display: flex; flex-direction: column; gap: 18px; text-align: left; }
+  .mode { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mode button, .origin button { border: 1.5px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 9px 22px; font-size: 14px; font-weight: 500; }
+  .mode button.active, .origin button.active { background: var(--night); border-color: var(--night); color: var(--cream); }
+  .origin { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .origin .lbl { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; margin-right: 4px; }
+  .origin button { padding: 7px 14px; font-size: 13px; }
+  .fields { display: grid; grid-template-columns: 1fr 1.2fr 2fr; gap: 14px; }
+  .field { border: 1.5px solid var(--line); border-radius: 15px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .field .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; color: var(--muted); }
+  .stepper { display: flex; align-items: center; gap: 14px; }
+  .stepper button { width: 30px; height: 30px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1; }
+  .stepper .num { font-size: 20px; font-weight: 600; min-width: 64px; }
+  .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opts button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500; color: var(--ink); }
+  .opts button.active { background: var(--chip); border-color: var(--night); }
+  .est-foot { display: flex; align-items: center; gap: 20px; border-top: 1.5px solid #eceae4; padding-top: 16px; flex-wrap: wrap; }
+  .est-total { display: flex; flex-direction: column; gap: 2px; }
+  .est-total .num { font-size: 26px; font-weight: 700; }
+  .est-total .sub { font-size: 13px; color: var(--muted); }
+  .breakdown-toggle { border: 0; background: transparent; font-size: 13.5px; font-weight: 600; color: var(--coral); padding: 0; }
+  .cta { margin-left: auto; border: 0; background: var(--coral); color: var(--cream); border-radius: 15px; padding: 17px 28px; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; }
+  .cta:hover { background: #c9531f; }
+  .breakdown { display: none; border-top: 1.5px dashed #eceae4; padding-top: 14px; }
+  .breakdown.open { display: block; }
+  .breakdown table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .breakdown td { padding: 5px 0; }
+  .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .breakdown .fine { font-size: 12.5px; color: var(--muted); padding-top: 10px; line-height: 1.5; }
+  .trust { position: relative; display: flex; justify-content: center; gap: 40px; padding: 34px 0 46px 0; font-size: 14.5px; color: var(--lavender); flex-wrap: wrap; }
+  .trust span { display: flex; align-items: center; gap: 8px; }
+
+  /* ---------- Content sections ---------- */
+  section.block { padding: 72px 0 12px 0; }
+  .block .kicker { font-size: 12.5px; letter-spacing: 0.22em; font-weight: 600; color: var(--coral); }
+  .block h2 { font-size: clamp(28px, 3.4vw, 40px); margin: 8px 0 10px 0; line-height: 1.12; }
+  .block .lede { font-size: 16.5px; line-height: 1.6; color: #55536a; max-width: 640px; margin: 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
+  .card { background: #fff; border: 1.5px solid #ece9e2; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+  .card .art { aspect-ratio: 16 / 9; display: block; width: 100%; object-fit: cover; background: var(--night-mid); }
+  .card .body { padding: 16px 18px 18px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .card h3 { margin: 0; font-size: 18.5px; }
+  .card p { margin: 0; font-size: 14px; line-height: 1.55; color: #55536a; }
+  .meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .meta span { font-size: 12px; font-weight: 600; background: var(--chip); border-radius: 999px; padding: 4px 10px; }
+  .meta .hard { background: #fbe3d6; color: #a33f12; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
+  .step { position: relative; border-top: 3px solid var(--sun); background: #fff; border-radius: 0 0 16px 16px; border-left: 1.5px solid #ece9e2; border-right: 1.5px solid #ece9e2; border-bottom: 1.5px solid #ece9e2; padding: 20px; }
+  .ribbon { position: absolute; top: -13px; right: 14px; background: var(--coral); color: var(--cream); border-radius: 999px; padding: 5px 13px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; box-shadow: 0 4px 10px rgba(226,98,43,0.35); }
+  .tagrow { display: flex; gap: 10px; align-items: center; margin: 12px 0 2px 0; flex-wrap: wrap; }
+  .tagrow span { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: #23663a; background: #e2f0e6; border-radius: 999px; padding: 7px 14px; }
+  .opts .pop { background: #fbe3d6; color: #a33f12; border-radius: 999px; padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; margin-left: 7px; }
+  .step .n { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--coral); font-size: 14px; letter-spacing: 0.12em; }
+  .step h3 { margin: 8px 0 6px 0; font-size: 18px; }
+  .step p { margin: 0; font-size: 14px; line-height: 1.55; color: #55536a; }
+
+  .permits { background: var(--night); color: var(--cream); border-radius: 20px; padding: 32px 34px; margin-top: 64px; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .permits h3 { margin: 0 0 6px 0; font-size: 21px; }
+  .permits p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--lavender); max-width: 680px; }
+  .permits .flag { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; color: var(--sun); }
+
+  footer { margin-top: 72px; background: var(--night-deep); color: var(--lavender); }
+  footer .shell { display: flex; justify-content: space-between; gap: 20px; padding: 30px 24px; font-size: 13.5px; flex-wrap: wrap; }
+
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(80px); background: var(--night); color: var(--cream); border-radius: 12px; padding: 13px 20px; font-size: 14px; box-shadow: 0 12px 30px rgba(9,10,32,0.35); opacity: 0; transition: transform 0.25s ease, opacity 0.25s ease; pointer-events: none; max-width: 90vw; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+
+  /* ---------- Hero photo-reveal layers ---------- */
+  .sky img.reveal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; filter: brightness(0.9) saturate(1.05); display: none; }
+  canvas#scratch { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
+
+  /* ---------- Date field & calendar ---------- */
+  .date-btn { border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ink); text-align: left; }
+  .date-btn .num { font-size: 19px; font-weight: 600; }
+  .cal { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; box-shadow: 0 18px 44px rgba(9,10,32,0.18); padding: 14px 16px; width: min(316px, calc(100vw - 72px)); }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .cal-head button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; width: 28px; height: 28px; font-size: 15px; line-height: 1; color: var(--ink); }
+  .cal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; }
+  .cal-season { font-size: 12px; font-weight: 600; margin: 2px 0 8px 0; display: flex; gap: 8px; align-items: center; }
+  .cal-season .badge { border-radius: 999px; padding: 3px 10px; background: var(--chip); }
+  .cal-season .badge.peak { background: #fbe3d6; color: #a33f12; }
+  .cal-season .badge.low { background: #e2f0e6; color: #23663a; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-grid .dow { font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: center; padding: 4px 0; letter-spacing: 0.05em; }
+  .cal-grid .dow.we, .cal-grid button.we { color: #a33f12; }
+  .cal-grid button { border: 0; background: transparent; border-radius: 9px; font-size: 13px; padding: 7px 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .cal-grid button.we { background: #fdf1e9; }
+  .cal-grid button:hover { outline: 1.5px solid var(--night); }
+  .cal-grid button.sel { background: var(--night); color: var(--cream); }
+  .cal-grid button:disabled { color: #c9c6bd; background: transparent; }
+  .cal-foot { font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+  @media (max-width: 860px) {
+    .fields { grid-template-columns: 1fr; }
+    .fields > .field { grid-column: auto !important; }
+    .origin { margin-left: 0; }
+    .pills { order: 3; width: 100%; justify-content: center; }
+    .trust { gap: 18px; }
+  }
+  @media (max-width: 560px) {
+    .shell { padding-left: 18px; padding-right: 18px; }
+    nav { padding: 16px 0; gap: 10px; }
+    .pills a { padding: 8px 14px; font-size: 13px; }
+    .currency button { padding: 6px 9px; font-size: 11.5px; }
+    .signin { padding: 10px 16px; font-size: 13.5px; }
+    .hero { padding-top: 34px; gap: 14px; }
+    .hero p { font-size: 16px; }
+    .estimator { padding: 18px 16px; margin-top: 28px; border-radius: 18px; }
+    .origin .lbl { display: none; }
+    .est-foot { flex-direction: column; align-items: stretch; gap: 12px; }
+    .breakdown-toggle { text-align: left; }
+    .cta { margin-left: 0; text-align: center; }
+    .trust { flex-direction: column; align-items: flex-start; gap: 12px; padding: 26px 0 34px 0; }
+    section.block { padding: 52px 0 8px 0; }
+    .permits { padding: 24px 22px; margin-top: 44px; }
+    footer .shell { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <svg class="backdrop" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="1440" height="900" fill="#1d1f4e"></rect>
+    <circle cx="1150" cy="170" r="105" fill="#f2a154"></circle>
+    <path d="M0 640 L260 380 L420 530 L640 280 L860 540 L1080 400 L1260 540 L1440 450 L1440 900 L0 900 Z" fill="#2b2e6b"></path>
+    <path d="M640 280 L706 366 L658 380 L610 336 Z" fill="#fdfaf5"></path>
+    <path d="M0 750 L220 590 L520 720 L820 580 L1120 720 L1440 610 L1440 900 L0 900 Z" fill="#151738"></path>
+  </svg>
+  <img class="reveal" id="reveal-img" alt="" aria-hidden="true">
+  <canvas id="scratch" aria-hidden="true"></canvas>
+
+  <div class="shell">
+    <nav>
+      <div class="wordmark">incredible<span>.sikkim</span></div>
+      <div class="pills">
+        <a href="#tourism">Tourism</a>
+        <a href="#trekking">Trekking</a>
+        <a href="#how">How it works</a>
+      </div>
+      <div class="nav-right">
+        <div class="currency" role="group" aria-label="Currency">
+          <button data-cur="INR" class="active">₹ INR</button>
+          <button data-cur="USD">$ USD</button>
+          <button data-cur="EUR">€ EUR</button>
+        </div>
+        <button class="signin" id="signin">Sign in</button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <h1>Plan your Sikkim trip in&nbsp;minutes.</h1>
+      <p>Honest cost estimates — never hidden pricing. Pick your days, your stay, your adventures, and see what Sikkim really costs in your currency.</p>
+    </div>
+
+    <div class="estimator" id="estimator">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <div class="mode" role="group" aria-label="Trip type">
+          <button data-mode="tourism" class="active">Tourism</button>
+          <button data-mode="trekking">Trekking</button>
+        </div>
+        <div class="origin" role="group" aria-label="Travelling from">
+          <span class="lbl">TRAVELLING FROM</span>
+          <button data-origin="india" class="active">India</button>
+          <button data-origin="abroad">Abroad</button>
+        </div>
+      </div>
+
+      <div class="fields">
+        <div class="field">
+          <span class="lbl">DAYS</span>
+          <div class="stepper">
+            <button id="days-minus" aria-label="Fewer days">−</button>
+            <span class="num" id="days-num">7 days</span>
+            <button id="days-plus" aria-label="More days">+</button>
+          </div>
+        </div>
+        <div class="field" id="date-field" style="position: relative;">
+          <span class="lbl">START DATE</span>
+          <button class="date-btn" id="date-btn" aria-haspopup="dialog">
+            <span class="num" id="date-txt">—</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 6 L8 10 L12 6" fill="none" stroke="#8a8894" stroke-width="1.8"></path></svg>
+          </button>
+          <div class="cal" id="cal" hidden></div>
+        </div>
+        <div class="field">
+          <span class="lbl">STAY TYPE</span>
+          <div class="opts" id="stay-opts"></div>
+        </div>
+        <div class="field" id="act-field">
+          <span class="lbl" id="act-label">ACTIVITIES</span>
+          <div class="opts" id="act-opts"></div>
+        </div>
+        <div class="field" id="comp-field">
+          <span class="lbl">SATHI — YOUR LOCAL COMPANION</span>
+          <div class="opts" id="comp-opts"></div>
+        </div>
+      </div>
+
+      <div class="est-foot">
+        <div class="est-total">
+          <span class="num" id="est-range">—</span>
+          <span class="sub" id="est-sub">per person, estimated</span>
+        </div>
+        <button class="breakdown-toggle" id="bd-toggle">See the breakdown ▸</button>
+        <button class="cta" id="cta">Get my estimate →</button>
+      </div>
+
+      <div class="breakdown" id="breakdown">
+        <table id="bd-table"></table>
+        <div class="fine">Estimates only — real trips vary with season, group size and operator. Figures in this prototype are sample rates; currency conversion is approximate. Exact quotes come from local operators when you book.</div>
+      </div>
+    </div>
+
+    <div class="trust">
+      <span><svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="#f2a154" stroke-width="2"></path></svg>Permit guidance for international visitors</span>
+      <span><svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="#f2a154" stroke-width="2"></path></svg>Local Sikkimese operators</span>
+      <span><svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" fill="none" stroke="#f2a154" stroke-width="2"></path></svg>Estimates, never surprises</span>
+    </div>
+  </div>
+</div>
+
+<section class="block shell" id="tourism">
+  <div class="kicker">TOURISM</div>
+  <h2>Valleys, lakes &amp; monasteries</h2>
+  <p class="lede">Road journeys at your own pace — Gangtok's monasteries, the frozen shore of Tsomgo, and the flower valleys of the north.</p>
+  <div class="cards">
+    <div class="card">
+      <img class="art" loading="lazy" alt="Bird's-eye view of Gangtok city on the hillside" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg/960px-Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg">
+      <div class="body">
+        <h3>Gangtok &amp; around</h3>
+        <p>Rumtek and Enchey monasteries, MG Marg, the Teesta cable car and momo kitchens.</p>
+        <div class="meta"><span>2–3 days</span><span>Easy pace</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Tsomgo Lake ringed by mountains" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg/960px-Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg">
+      <div class="body">
+        <h3>Tsomgo Lake</h3>
+        <p>A glacial lake at 3,753 m that freezes blue-white in winter — yaks and prayer flags included.</p>
+        <div class="meta"><span>Day trip</span><span>Permit needed</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Bridge over the river in Yumthang Valley" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg/960px-Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg">
+      <div class="body">
+        <h3>Lachung &amp; Yumthang</h3>
+        <p>North Sikkim's valley of flowers, hot springs and the road to Zero Point at 4,600 m.</p>
+        <div class="meta"><span>2-day add-on</span><span>Seasonal</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Kanchenjunga seen from Pelling" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Kanchenjunga_View_from_Pelling_Hotel.jpg/960px-Kanchenjunga_View_from_Pelling_Hotel.jpg">
+      <div class="body">
+        <h3>Pelling &amp; the west</h3>
+        <p>Pemayangtse monastery, the glass skywalk, and the classic dawn view of Kanchenjunga.</p>
+        <div class="meta"><span>2 days</span><span>Best Oct–Dec</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block shell" id="sathi">
+  <div class="kicker">TOURISM SERVICE</div>
+  <h2>Sathi — your local companion</h2>
+  <div class="tagrow">
+    <span><svg width="15" height="15" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M8 1 L13.5 3.2 V7.4 C13.5 11 11.2 13.6 8 14.8 C4.8 13.6 2.5 11 2.5 7.4 V3.2 Z" fill="none" stroke="#23663a" stroke-width="1.5"></path><path d="M5.4 8 L7.2 9.8 L10.7 6" fill="none" stroke="#23663a" stroke-width="1.6"></path></svg>Verified &amp; trained</span>
+  </div>
+  <p class="lede">"Sathi" means companion. A local Sikkimese host — identity-verified and trained in hospitality and first response — who plans with you, books for you, and makes you feel less like a tourist and more like a friend visiting. Pick only the parts you want — each is priced separately in the estimator.</p>
+  <div class="steps">
+    <div class="step">
+      <span class="n">PLAN &amp; BOOK</span>
+      <h3>Itinerary planning &amp; bookings</h3>
+      <p>Your Sathi shapes the itinerary around your pace, then books the tickets, cars and rooms — before you even land.</p>
+    </div>
+    <div class="step">
+      <span class="ribbon">MOST POPULAR</span>
+      <span class="n">DURING YOUR TRIP</span>
+      <h3>On-trip assistance</h3>
+      <p>A local friend on call every day — hidden food gems, the monastery worth the detour, help in any emergency, and no language barrier: your Sathi speaks the local languages and English for you.</p>
+    </div>
+    <div class="step">
+      <span class="n">ARRIVAL &amp; DEPARTURE</span>
+      <h3>Pickup &amp; drop</h3>
+      <p>Met at the airport or railhead and dropped back safely — especially reassuring for solo and first-time international travellers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block shell" id="trekking">
+  <div class="kicker">TREKKING</div>
+  <h2>Dzongri, Goechala &amp; beyond</h2>
+  <p class="lede">Guided multi-day treks with local crews — graded honestly, priced as ranges, permits arranged for foreign trekkers.</p>
+  <div class="cards">
+    <div class="card">
+      <img class="art" loading="lazy" alt="On the Goechala trek" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Goechala_Trek.jpg/960px-Goechala_Trek.jpg">
+      <div class="body">
+        <h3>Goechala</h3>
+        <p>The big one — face to face with Kanchenjunga's south wall from 4,940 m.</p>
+        <div class="meta"><span>11 days</span><span class="hard">Demanding</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Mount Narsing seen from Dzongri" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Mt._Narsing_from_Dzongri_DSC04018.jpg/960px-Mt._Narsing_from_Dzongri_DSC04018.jpg">
+      <div class="body">
+        <h3>Dzongri ridge</h3>
+        <p>The short, steep classic — rhododendron forest to a 4,020 m sunrise ridge.</p>
+        <div class="meta"><span>5 days</span><span class="hard">Moderate</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Kanchenjunga from the Singalila ridge trail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg/960px-Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg">
+      <div class="body">
+        <h3>Singalila ridge</h3>
+        <p>Border-ridge walking with four 8,000 m giants on the horizon on a clear day.</p>
+        <div class="meta"><span>7 days</span><span class="hard">Moderate</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <img class="art" loading="lazy" alt="Kanchenjunga east face above the Zemu glacier" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kangchenjunga_East_Face_from_Zemu_Glacier.jpg/960px-Kangchenjunga_East_Face_from_Zemu_Glacier.jpg">
+      <div class="body">
+        <h3>Green Lake</h3>
+        <p>Remote north-side basecamp trek under Kanchenjunga — for experienced parties.</p>
+        <div class="meta"><span>8 days</span><span class="hard">Strenuous</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block shell" id="how">
+  <div class="kicker">HOW IT WORKS</div>
+  <h2>Estimate first. Book with confidence.</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="n">STEP 1</span>
+      <h3>Get your estimate</h3>
+      <p>Days, stay and activities in — an honest cost range out, in rupees, dollars or euros. No sign-up needed.</p>
+    </div>
+    <div class="step">
+      <span class="n">STEP 2</span>
+      <h3>Shape the trip</h3>
+      <p>Save your estimate to your account and refine it with a local operator until the itinerary fits.</p>
+    </div>
+    <div class="step">
+      <span class="n">STEP 3</span>
+      <h3>Book &amp; manage</h3>
+      <p>Confirm, then sign back in any time to check your booking, your history and your permits.</p>
+    </div>
+  </div>
+
+  <div class="permits">
+    <div>
+      <div class="flag">VISITING FROM OUTSIDE INDIA?</div>
+      <h3>Permits, handled.</h3>
+      <p>Foreign nationals need an Inner Line Permit for Sikkim and extra permits for protected areas like Tsomgo and the trekking routes. We tell you exactly what applies to your itinerary and arrange the paperwork with your operator.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <span>incredible.sikkim — design prototype, sample rates only</span>
+    <span>Photos: Wikimedia Commons contributors (CC BY / CC BY-SA / PD)</span>
+    <span>Tourism · Trekking · Estimates in ₹ $ €</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+  var start = new Date(); start.setDate(start.getDate() + 30);
+  var state = { mode: 'tourism', origin: 'india', days: 7, currency: 'INR', stay: 'standard', acts: ['tsomgo'], comp: [], start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
+
+  // Sample seasonal pricing: monthly factor on stay + daily costs, weekends +15%.
+  var SEASON = [
+    { f: 0.90, tag: 'Quiet winter', cls: 'low' },  { f: 0.90, tag: 'Quiet winter', cls: 'low' },
+    { f: 1.10, tag: 'Rhododendron spring', cls: '' }, { f: 1.15, tag: 'Spring peak', cls: 'peak' },
+    { f: 1.10, tag: 'Late spring', cls: '' },      { f: 0.85, tag: 'Monsoon', cls: 'low' },
+    { f: 0.80, tag: 'Monsoon', cls: 'low' },       { f: 0.80, tag: 'Monsoon', cls: 'low' },
+    { f: 1.00, tag: 'Clearing skies', cls: '' },   { f: 1.25, tag: 'Autumn peak', cls: 'peak' },
+    { f: 1.20, tag: 'Autumn peak', cls: 'peak' },  { f: 1.10, tag: 'Festive winter', cls: '' }
+  ];
+  var WEEKEND_FACTOR = 1.15;
+
+  var COMPANION = [
+    { id: 'plan', label: 'Plan & book', cost: 3500, perDay: false },
+    { id: 'assist', label: 'On-trip assistance', cost: 1200, perDay: true },
+    { id: 'pickup', label: 'Pickup & drop', cost: 2800, perDay: false }
+  ];
+
+  var STAYS = {
+    tourism: [
+      { id: 'homestay', label: 'Homestay', perNight: 2200 },
+      { id: 'standard', label: 'Standard hotel', perNight: 3800 },
+      { id: 'boutique', label: 'Boutique', perNight: 7000 },
+      { id: 'luxury', label: 'Luxury', perNight: 13000 }
+    ],
+    trekking: [
+      { id: 'camp-std', label: 'Standard camp', perNight: 4800 },
+      { id: 'camp-comfort', label: 'Comfort camp', perNight: 6500 },
+      { id: 'teahouse', label: 'Teahouse mix', perNight: 4000 }
+    ]
+  };
+
+  var ACTS = {
+    tourism: [
+      { id: 'tsomgo', label: 'Tsomgo Lake day trip', cost: 3500 },
+      { id: 'north', label: 'Lachung–Yumthang (2-day)', cost: 8000 },
+      { id: 'monasteries', label: 'Monastery circuit', cost: 1500 },
+      { id: 'cablecar', label: 'Cable car & city', cost: 800 },
+      { id: 'rafting', label: 'Teesta rafting', cost: 1800 }
+    ],
+    trekking: [
+      { id: 'gear', label: 'Gear rental', cost: 2500 },
+      { id: 'porter', label: 'Personal porter', cost: 4500 },
+      { id: 'acclim', label: 'Extra acclimatisation day', cost: 5200 },
+      { id: 'darjeeling', label: 'Darjeeling extension', cost: 6000 }
+    ]
+  };
+
+  // Sample per-person daily cost for shared transport and meals (tourism only;
+  // trek packages already include food and crew).
+  var TRANSPORT_FOOD_PER_DAY = 1800;
+  var PERMITS = { tourism: { india: 500, abroad: 2500 }, trekking: { india: 1500, abroad: 4500 } };
+  var RATES = { INR: 1, USD: 1 / 88, EUR: 1 / 95 };
+  var SYMBOL = { INR: '₹', USD: '$', EUR: '€' };
+
+  function fmt(inr, cur) {
+    var v = inr * RATES[cur];
+    var rounded = cur === 'INR' ? Math.round(v / 500) * 500 : Math.round(v / 5) * 5;
+    return SYMBOL[cur] + rounded.toLocaleString(cur === 'INR' ? 'en-IN' : 'en-US');
+  }
+  function fmtExact(inr, cur) {
+    var v = Math.round(inr * RATES[cur]);
+    return SYMBOL[cur] + v.toLocaleString(cur === 'INR' ? 'en-IN' : 'en-US');
+  }
+
+  function tripDates() {
+    var ds = [];
+    for (var i = 0; i < state.days; i++) {
+      var d = new Date(state.start); d.setDate(d.getDate() + i); ds.push(d);
+    }
+    return ds;
+  }
+
+  function seasonInfo() {
+    var ds = tripDates(), sum = 0, weekends = 0;
+    ds.forEach(function (d) {
+      var we = d.getDay() === 0 || d.getDay() === 6;
+      if (we) weekends++;
+      sum += SEASON[d.getMonth()].f * (we ? WEEKEND_FACTOR : 1);
+    });
+    return { factor: sum / ds.length, weekends: weekends, tag: SEASON[state.start.getMonth()].tag };
+  }
+
+  function lines() {
+    var stays = STAYS[state.mode], acts = ACTS[state.mode];
+    var stay = stays.find(function (s) { return s.id === state.stay; }) || stays[0];
+    var nights = Math.max(state.days - 1, 1);
+    var out = [];
+    var variable = stay.perNight * nights;
+    out.push({ label: stay.label + ' × ' + nights + ' nights', inr: variable });
+    if (state.mode === 'tourism') {
+      var tf = TRANSPORT_FOOD_PER_DAY * state.days;
+      variable += tf;
+      out.push({ label: 'Shared transport & meals × ' + state.days + ' days', inr: tf });
+    } else {
+      out.push({ label: 'Guide, crew & meals (in package)', inr: 0 });
+    }
+    var si = seasonInfo();
+    var adj = Math.round((si.factor - 1) * variable);
+    if (adj !== 0) {
+      out.push({
+        label: 'Season & weekends (' + si.tag + (si.weekends ? ', ' + si.weekends + ' weekend day' + (si.weekends > 1 ? 's' : '') : '') + ')',
+        inr: adj, signed: true
+      });
+    }
+    state.acts.forEach(function (id) {
+      var a = acts.find(function (x) { return x.id === id; });
+      if (a) out.push({ label: a.label, inr: a.cost });
+    });
+    if (state.mode === 'tourism') {
+      state.comp.forEach(function (id) {
+        var c = COMPANION.find(function (x) { return x.id === id; });
+        if (c) out.push({
+          label: 'Sathi: ' + c.label + (c.perDay ? ' × ' + state.days + ' days' : ''),
+          inr: c.perDay ? c.cost * state.days : c.cost
+        });
+      });
+    }
+    out.push({ label: 'Permits & fees (' + (state.origin === 'india' ? 'Indian national' : 'foreign national') + ')', inr: PERMITS[state.mode][state.origin] });
+    return out;
+  }
+
+  function render() {
+    document.querySelectorAll('.mode button').forEach(function (b) { b.classList.toggle('active', b.dataset.mode === state.mode); });
+    document.querySelectorAll('.origin button').forEach(function (b) { b.classList.toggle('active', b.dataset.origin === state.origin); });
+    document.querySelectorAll('.currency button').forEach(function (b) { b.classList.toggle('active', b.dataset.cur === state.currency); });
+    document.getElementById('days-num').textContent = state.days + ' days';
+
+    var stayBox = document.getElementById('stay-opts');
+    stayBox.innerHTML = '';
+    STAYS[state.mode].forEach(function (s) {
+      var b = document.createElement('button');
+      b.textContent = s.label;
+      b.classList.toggle('active', s.id === state.stay);
+      b.onclick = function () { state.stay = s.id; render(); };
+      stayBox.appendChild(b);
+    });
+
+    document.getElementById('date-txt').textContent = state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+    document.getElementById('act-label').textContent = state.mode === 'tourism' ? 'ACTIVITIES' : 'ADD-ONS';
+    var actBox = document.getElementById('act-opts');
+    actBox.innerHTML = '';
+    ACTS[state.mode].forEach(function (a) {
+      var b = document.createElement('button');
+      b.textContent = a.label;
+      b.classList.toggle('active', state.acts.indexOf(a.id) !== -1);
+      b.onclick = function () {
+        var i = state.acts.indexOf(a.id);
+        if (i === -1) state.acts.push(a.id); else state.acts.splice(i, 1);
+        render();
+      };
+      actBox.appendChild(b);
+    });
+
+    var actField = document.getElementById('act-field');
+    var compField = document.getElementById('comp-field');
+    if (state.mode === 'tourism') {
+      actField.style.gridColumn = 'span 2';
+      compField.style.display = '';
+      var compBox = document.getElementById('comp-opts');
+      compBox.innerHTML = '';
+      COMPANION.forEach(function (c) {
+        var b = document.createElement('button');
+        b.textContent = c.label + ' · ' + fmtExact(c.cost, state.currency) + (c.perDay ? '/day' : '');
+        if (c.id === 'assist') {
+          var pop = document.createElement('span');
+          pop.className = 'pop'; pop.textContent = 'POPULAR';
+          b.appendChild(pop);
+        }
+        b.classList.toggle('active', state.comp.indexOf(c.id) !== -1);
+        b.onclick = function () {
+          var i = state.comp.indexOf(c.id);
+          if (i === -1) state.comp.push(c.id); else state.comp.splice(i, 1);
+          render();
+        };
+        compBox.appendChild(b);
+      });
+    } else {
+      actField.style.gridColumn = '1 / -1';
+      compField.style.display = 'none';
+    }
+
+    renderCal();
+
+    var all = lines();
+    var total = all.reduce(function (t, l) { return t + l.inr; }, 0);
+    var lo = total * 0.92, hi = total * 1.12;
+    document.getElementById('est-range').textContent = fmt(lo, state.currency) + ' – ' + fmt(hi, state.currency);
+    var end = new Date(state.start); end.setDate(end.getDate() + state.days - 1);
+    var range = state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== state.currency; })
+      .map(function (c) { return '≈ ' + fmt(lo, c) + '–' + fmt(hi, c); }).join(' · ');
+    document.getElementById('est-sub').textContent = range + ' · per person, estimated · ' + others;
+
+    var table = document.getElementById('bd-table');
+    table.innerHTML = '';
+    all.forEach(function (l) {
+      var tr = document.createElement('tr');
+      var td1 = document.createElement('td'); td1.textContent = l.label;
+      var td2 = document.createElement('td');
+      if (l.inr === 0) td2.textContent = 'included';
+      else if (l.signed) td2.textContent = (l.inr < 0 ? '− ' : '+ ') + fmtExact(Math.abs(l.inr), state.currency);
+      else td2.textContent = fmtExact(l.inr, state.currency);
+      tr.appendChild(td1); tr.appendChild(td2); table.appendChild(tr);
+    });
+  }
+
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove('show'); }, 3200);
+  }
+
+  document.querySelectorAll('.mode button').forEach(function (b) {
+    b.onclick = function () {
+      state.mode = b.dataset.mode;
+      state.stay = STAYS[state.mode][state.mode === 'tourism' ? 1 : 0].id;
+      state.acts = state.mode === 'tourism' ? ['tsomgo'] : [];
+      state.days = state.mode === 'tourism' ? 7 : 5;
+      render();
+    };
+  });
+  document.querySelectorAll('.origin button').forEach(function (b) {
+    b.onclick = function () { state.origin = b.dataset.origin; render(); };
+  });
+  document.querySelectorAll('.currency button').forEach(function (b) {
+    b.onclick = function () { state.currency = b.dataset.cur; render(); };
+  });
+  document.getElementById('days-minus').onclick = function () { state.days = Math.max(2, state.days - 1); render(); };
+  document.getElementById('days-plus').onclick = function () { state.days = Math.min(21, state.days + 1); render(); };
+  document.getElementById('bd-toggle').onclick = function () {
+    var bd = document.getElementById('breakdown');
+    bd.classList.toggle('open');
+    this.textContent = bd.classList.contains('open') ? 'Hide the breakdown ▾' : 'See the breakdown ▸';
+  };
+  document.getElementById('cta').onclick = function () {
+    toast('In the full build this saves your estimate to your account.');
+  };
+  document.getElementById('signin').onclick = function () {
+    toast('Accounts (email login, trip history, bookings) arrive with the full build.');
+  };
+
+  /* ---------- Calendar ---------- */
+  var calOpen = false;
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+
+  function renderCal() {
+    var cal = document.getElementById('cal');
+    cal.hidden = !calOpen;
+    if (!calOpen) return;
+    var y = state.calMonth.getFullYear(), m = state.calMonth.getMonth();
+    var season = SEASON[m];
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    cal.innerHTML = '';
+
+    var head = document.createElement('div'); head.className = 'cal-head';
+    var prev = document.createElement('button'); prev.textContent = '‹'; prev.setAttribute('aria-label', 'Previous month');
+    prev.onclick = function () { state.calMonth = new Date(y, m - 1, 1); renderCal(); };
+    var title = document.createElement('span'); title.className = 'cal-title'; title.textContent = MONTHS[m] + ' ' + y;
+    var next = document.createElement('button'); next.textContent = '›'; next.setAttribute('aria-label', 'Next month');
+    next.onclick = function () { state.calMonth = new Date(y, m + 1, 1); renderCal(); };
+    head.appendChild(prev); head.appendChild(title); head.appendChild(next);
+    cal.appendChild(head);
+
+    var badge = document.createElement('div'); badge.className = 'cal-season';
+    var b1 = document.createElement('span'); b1.className = 'badge ' + season.cls; b1.textContent = season.tag;
+    var b2 = document.createElement('span'); b2.style.color = '#8a8894';
+    var pct = Math.round((season.f - 1) * 100);
+    b2.textContent = (pct === 0 ? 'base rates' : (pct > 0 ? '+' + pct + '%' : pct + '%') + ' vs base');
+    badge.appendChild(b1); badge.appendChild(b2);
+    cal.appendChild(badge);
+
+    var grid = document.createElement('div'); grid.className = 'cal-grid';
+    ['M','T','W','T','F','S','S'].forEach(function (d, i) {
+      var s = document.createElement('span'); s.className = 'dow' + (i >= 5 ? ' we' : ''); s.textContent = d;
+      grid.appendChild(s);
+    });
+    var first = new Date(y, m, 1);
+    var lead = (first.getDay() + 6) % 7; // Monday-first offset
+    for (var i = 0; i < lead; i++) grid.appendChild(document.createElement('span'));
+    var daysIn = new Date(y, m + 1, 0).getDate();
+    for (var d = 1; d <= daysIn; d++) {
+      (function (d) {
+        var date = new Date(y, m, d);
+        var b = document.createElement('button');
+        b.textContent = d;
+        var we = date.getDay() === 0 || date.getDay() === 6;
+        if (we) b.classList.add('we');
+        if (sameDay(date, state.start)) b.classList.add('sel');
+        if (date < today) b.disabled = true;
+        b.onclick = function () { state.start = date; calOpen = false; render(); };
+        grid.appendChild(b);
+      })(d);
+    }
+    cal.appendChild(grid);
+
+    var foot = document.createElement('div'); foot.className = 'cal-foot';
+    foot.textContent = 'Weekend days (tinted) cost about 15% more. Monthly rates vary by season.';
+    cal.appendChild(foot);
+  }
+
+  document.getElementById('cal').addEventListener('click', function (e) { e.stopPropagation(); });
+  document.getElementById('date-btn').onclick = function (e) {
+    e.stopPropagation();
+    calOpen = !calOpen;
+    state.calMonth = new Date(state.start.getFullYear(), state.start.getMonth(), 1);
+    renderCal();
+  };
+  document.addEventListener('click', function (e) {
+    if (calOpen && !document.getElementById('date-field').contains(e.target)) { calOpen = false; renderCal(); }
+  });
+
+  /* ---------- Landing-page photo reveal ("eraser") ---------- */
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var PHOTOS = [
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Kanchenjungha_and.._premonsoon_season_view_from_Pelling_%2C_West_Sikkim.jpg/1920px-Kanchenjungha_and.._premonsoon_season_view_from_Pelling_%2C_West_Sikkim.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Tsomgo_Lake%2C_Sikkim%2C_India.jpg/1920px-Tsomgo_Lake%2C_Sikkim%2C_India.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg/1920px-Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Rumtek_Monastery_01.jpg/1920px-Rumtek_Monastery_01.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Gurudongmar_Lake%2C_India.jpg/1920px-Gurudongmar_Lake%2C_India.jpg'
+    ];
+    var sky = document.querySelector('.sky');
+    var svg = sky.querySelector('svg.backdrop');
+    var img = document.getElementById('reveal-img');
+    var canvas = document.getElementById('scratch');
+    var ctx = canvas.getContext('2d');
+    var overlay = null, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    img.onload = function () {
+      overlay = new Image();
+      overlay.onload = function () {
+        img.style.display = 'block';
+        canvas.style.display = 'block';
+        paint();
+      };
+      overlay.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+    };
+    var idx;
+    try {
+      idx = (parseInt(localStorage.getItem('heroPhotoIdx') || '-1', 10) + 1) % PHOTOS.length;
+      localStorage.setItem('heroPhotoIdx', String(idx));
+    } catch (e) { idx = Math.floor(Math.random() * PHOTOS.length); }
+    img.src = PHOTOS[idx];
+
+    function drawOverlay() {
+      var w = canvas.width / dpr, h = canvas.height / dpr;
+      var scale = Math.max(w / 1440, h / 900);
+      var dw = 1440 * scale, dh = 900 * scale;
+      ctx.drawImage(overlay, (w - dw) / 2, h - dh, dw, dh);
+    }
+    function paint() {
+      var r = sky.getBoundingClientRect();
+      canvas.width = Math.round(r.width * dpr);
+      canvas.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawOverlay();
+    }
+    function erase(x, y) {
+      var r = canvas.getBoundingClientRect();
+      var cx = x - r.left, cy = y - r.top;
+      var rad = 85;
+      var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.75, 'rgba(0,0,0,1)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    sky.addEventListener('mousemove', function (e) { if (overlay) erase(e.clientX, e.clientY); });
+    sky.addEventListener('touchmove', function (e) {
+      if (overlay && e.touches.length) erase(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    window.addEventListener('resize', function () { if (overlay) paint(); });
+  })();
+
+  render();
+</script>
+</body>
+</html>
