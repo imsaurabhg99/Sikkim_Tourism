@@ -55,6 +55,7 @@
   .opts { display: flex; gap: 6px; flex-wrap: wrap; }
   .opts button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500; color: var(--ink); }
   .opts button.active { background: var(--chip); border-color: var(--night); }
+  .opts button:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
   .est-foot { display: flex; align-items: center; gap: 20px; border-top: 1.5px solid #eceae4; padding-top: 16px; flex-wrap: wrap; }
   .est-total { display: flex; flex-direction: column; gap: 2px; }
   .est-total .num { font-size: 26px; font-weight: 700; }
@@ -202,6 +203,7 @@
         <div class="mode" role="group" aria-label="Trip type">
           <button data-mode="tourism" class="active">Tourism</button>
           <button data-mode="trekking">Trekking</button>
+          <button data-mode="alacarte">À la carte</button>
         </div>
         <div class="origin" role="group" aria-label="Travelling from">
           <span class="lbl">TRAVELLING FROM</span>
@@ -211,12 +213,20 @@
       </div>
 
       <div class="fields">
-        <div class="field">
+        <div class="field" id="days-field">
           <span class="lbl">DAYS</span>
           <div class="stepper">
             <button id="days-minus" aria-label="Fewer days">−</button>
             <span class="num" id="days-num">7 days</span>
             <button id="days-plus" aria-label="More days">+</button>
+          </div>
+        </div>
+        <div class="field" id="people-field" style="display: none;">
+          <span class="lbl">INDIVIDUALS</span>
+          <div class="stepper">
+            <button id="people-minus" aria-label="Fewer people">−</button>
+            <span class="num" id="people-num">2 people</span>
+            <button id="people-plus" aria-label="More people">+</button>
           </div>
         </div>
         <div class="field" id="date-field" style="position: relative;">
@@ -227,7 +237,7 @@
           </button>
           <div class="cal" id="cal" hidden></div>
         </div>
-        <div class="field">
+        <div class="field" id="stay-field">
           <span class="lbl">STAY TYPE</span>
           <div class="opts" id="stay-opts"></div>
         </div>
@@ -413,7 +423,7 @@
 
 <script>
   var start = new Date(); start.setDate(start.getDate() + 30);
-  var state = { mode: 'tourism', origin: 'india', days: 7, currency: 'INR', stay: 'standard', acts: ['tsomgo'], comp: [], start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
+  var state = { mode: 'tourism', origin: 'india', days: 7, people: 2, currency: 'INR', stay: 'standard', acts: ['tsomgo'], comp: [], start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
 
   // Sample seasonal pricing: monthly factor on stay + daily costs, weekends +15%.
   var SEASON = [
@@ -459,8 +469,14 @@
       { id: 'porter', label: 'Personal porter', cost: 4500 },
       { id: 'acclim', label: 'Extra acclimatisation day', cost: 5200 },
       { id: 'darjeeling', label: 'Darjeeling extension', cost: 6000 }
+    ],
+    alacarte: [
+      { id: 'cab', label: 'Cab — pickup & drop', cost: 2800, perVehicle: true },
+      { id: 'nathula', label: 'Day tour: Nathula Pass', cost: 4500, perPerson: true, group: 'tour', indiaOnly: true },
+      { id: 'south', label: 'Day tour: South Sikkim', cost: 3200, perPerson: true, group: 'tour' }
     ]
   };
+  var CAB_SEATS = 4; // sample: one cab carries up to 4
 
   // Sample per-person daily cost for shared transport and meals (tourism only;
   // trek packages already include food and crew).
@@ -498,6 +514,33 @@
   }
 
   function lines() {
+    if (state.mode === 'alacarte') {
+      var out2 = [], varSum = 0;
+      state.acts.forEach(function (id) {
+        var a = ACTS.alacarte.find(function (x) { return x.id === id; });
+        if (!a) return;
+        var amt, label = a.label;
+        if (a.perVehicle) {
+          var cabs = Math.ceil(state.people / CAB_SEATS);
+          amt = a.cost * cabs;
+          label += ' (' + cabs + ' cab' + (cabs > 1 ? 's' : '') + ', up to ' + CAB_SEATS + ' seats each)';
+        } else {
+          amt = a.cost * state.people;
+          label += ' × ' + state.people + (a.indiaOnly ? ' (permit included)' : '');
+        }
+        varSum += amt;
+        out2.push({ label: label, inr: amt });
+      });
+      var si2 = seasonInfo();
+      var adj2 = Math.round((si2.factor - 1) * varSum);
+      if (adj2 !== 0 && varSum > 0) {
+        out2.push({
+          label: 'Season & weekend (' + si2.tag + (si2.weekends ? ', weekend day' : '') + ')',
+          inr: adj2, signed: true
+        });
+      }
+      return out2;
+    }
     var stays = STAYS[state.mode], acts = ACTS[state.mode];
     var stay = stays.find(function (s) { return s.id === state.stay; }) || stays[0];
     var nights = Math.max(state.days - 1, 1);
@@ -541,10 +584,17 @@
     document.querySelectorAll('.origin button').forEach(function (b) { b.classList.toggle('active', b.dataset.origin === state.origin); });
     document.querySelectorAll('.currency button').forEach(function (b) { b.classList.toggle('active', b.dataset.cur === state.currency); });
     document.getElementById('days-num').textContent = state.days + ' days';
+    document.getElementById('people-num').textContent = state.people + (state.people > 1 ? ' people' : ' person');
+
+    var alc = state.mode === 'alacarte';
+    document.getElementById('days-field').style.display = alc ? 'none' : '';
+    document.getElementById('people-field').style.display = alc ? '' : 'none';
+    document.getElementById('stay-field').style.display = alc ? 'none' : '';
+    document.querySelector('#date-field .lbl').textContent = alc ? 'DATE' : 'START DATE';
 
     var stayBox = document.getElementById('stay-opts');
     stayBox.innerHTML = '';
-    STAYS[state.mode].forEach(function (s) {
+    (STAYS[state.mode] || []).forEach(function (s) {
       var b = document.createElement('button');
       b.textContent = s.label;
       b.classList.toggle('active', s.id === state.stay);
@@ -554,16 +604,31 @@
 
     document.getElementById('date-txt').textContent = state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-    document.getElementById('act-label').textContent = state.mode === 'tourism' ? 'ACTIVITIES' : 'ADD-ONS';
+    document.getElementById('act-label').textContent = state.mode === 'tourism' ? 'ACTIVITIES' : (state.mode === 'trekking' ? 'ADD-ONS' : 'OFFERINGS');
     var actBox = document.getElementById('act-opts');
     actBox.innerHTML = '';
     ACTS[state.mode].forEach(function (a) {
       var b = document.createElement('button');
-      b.textContent = a.label;
+      b.textContent = alc
+        ? a.label + ' · ' + fmtExact(a.cost, state.currency) + (a.perVehicle ? '/cab' : '/person')
+        : a.label;
+      var blocked = alc && a.indiaOnly && state.origin === 'abroad';
+      if (blocked) {
+        b.disabled = true;
+        b.title = 'Nathula permits are issued to Indian nationals only';
+      }
       b.classList.toggle('active', state.acts.indexOf(a.id) !== -1);
       b.onclick = function () {
         var i = state.acts.indexOf(a.id);
-        if (i === -1) state.acts.push(a.id); else state.acts.splice(i, 1);
+        if (i === -1) {
+          if (a.group) {
+            state.acts = state.acts.filter(function (id) {
+              var o = ACTS[state.mode].find(function (x) { return x.id === id; });
+              return !(o && o.group === a.group);
+            });
+          }
+          state.acts.push(a.id);
+        } else state.acts.splice(i, 1);
         render();
       };
       actBox.appendChild(b);
@@ -593,7 +658,7 @@
         compBox.appendChild(b);
       });
     } else {
-      actField.style.gridColumn = '1 / -1';
+      actField.style.gridColumn = alc ? '' : '1 / -1';
       compField.style.display = 'none';
     }
 
@@ -604,10 +669,13 @@
     var lo = total * 0.92, hi = total * 1.12;
     document.getElementById('est-range').textContent = fmt(lo, state.currency) + ' – ' + fmt(hi, state.currency);
     var end = new Date(state.start); end.setDate(end.getDate() + state.days - 1);
-    var range = state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    var range = alc
+      ? state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
+      : state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== state.currency; })
       .map(function (c) { return '≈ ' + fmt(lo, c) + '–' + fmt(hi, c); }).join(' · ');
-    document.getElementById('est-sub').textContent = range + ' · per person, estimated · ' + others;
+    var basis = alc ? 'for ' + state.people + (state.people > 1 ? ' people' : ' person') + ', estimated' : 'per person, estimated';
+    document.getElementById('est-sub').textContent = range + ' · ' + basis + ' · ' + others;
 
     var table = document.getElementById('bd-table');
     table.innerHTML = '';
@@ -633,20 +701,34 @@
   document.querySelectorAll('.mode button').forEach(function (b) {
     b.onclick = function () {
       state.mode = b.dataset.mode;
-      state.stay = STAYS[state.mode][state.mode === 'tourism' ? 1 : 0].id;
-      state.acts = state.mode === 'tourism' ? ['tsomgo'] : [];
-      state.days = state.mode === 'tourism' ? 7 : 5;
+      if (state.mode === 'alacarte') {
+        state.days = 1;
+        state.acts = state.origin === 'india' ? ['cab', 'nathula'] : ['cab', 'south'];
+      } else {
+        state.stay = STAYS[state.mode][state.mode === 'tourism' ? 1 : 0].id;
+        state.acts = state.mode === 'tourism' ? ['tsomgo'] : [];
+        state.days = state.mode === 'tourism' ? 7 : 5;
+      }
       render();
     };
   });
   document.querySelectorAll('.origin button').forEach(function (b) {
-    b.onclick = function () { state.origin = b.dataset.origin; render(); };
+    b.onclick = function () {
+      state.origin = b.dataset.origin;
+      if (state.origin === 'abroad' && state.mode === 'alacarte' && state.acts.indexOf('nathula') !== -1) {
+        state.acts.splice(state.acts.indexOf('nathula'), 1);
+        toast('Nathula permits are for Indian nationals only — removed from your day. South Sikkim is open to everyone.');
+      }
+      render();
+    };
   });
   document.querySelectorAll('.currency button').forEach(function (b) {
     b.onclick = function () { state.currency = b.dataset.cur; render(); };
   });
   document.getElementById('days-minus').onclick = function () { state.days = Math.max(2, state.days - 1); render(); };
   document.getElementById('days-plus').onclick = function () { state.days = Math.min(21, state.days + 1); render(); };
+  document.getElementById('people-minus').onclick = function () { state.people = Math.max(1, state.people - 1); render(); };
+  document.getElementById('people-plus').onclick = function () { state.people = Math.min(16, state.people + 1); render(); };
   document.getElementById('bd-toggle').onclick = function () {
     var bd = document.getElementById('breakdown');
     bd.classList.toggle('open');
