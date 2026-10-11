@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trip — incredible.sikkim</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sky trip-hero">
+  <img class="cover" id="cover" alt="">
+  <div class="shade"></div>
+  <div class="shell">
+    <nav>
+      <a class="wordmark" href="index.html">incredible<span>.sikkim</span></a>
+      <div class="pills">
+        <a href="index.html#tourism">Tourism</a>
+        <a href="index.html#trekking">Trekking</a>
+        <a href="index.html#how">How it works</a>
+      </div>
+      <div class="nav-right">
+        <div class="currency" role="group" aria-label="Currency">
+          <button data-cur="INR">₹ INR</button>
+          <button data-cur="USD">$ USD</button>
+          <button data-cur="EUR">€ EUR</button>
+        </div>
+        <button class="signin" id="signin">Sign in</button>
+      </div>
+    </nav>
+    <div class="trip-head">
+      <a class="back" id="back" href="index.html">← All trips</a>
+      <h1 id="title">Trip not found</h1>
+      <p class="subtitle" id="subtitle">This trip doesn't exist. Head back to see all tours and treks.</p>
+      <div class="meta" id="chips"></div>
+      <div class="trip-price" id="price"></div>
+    </div>
+  </div>
+</div>
+
+<main id="main" hidden>
+  <section class="block shell overview">
+    <div class="kicker">OVERVIEW</div>
+    <h2>About this trip</h2>
+    <div id="overview"></div>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <section class="block shell" id="itinerary-block">
+    <div class="kicker">DAY-WISE ITINERARY</div>
+    <h2 id="itinerary-title">Day by day</h2>
+    <ol class="timeline" id="timeline"></ol>
+    <div class="soon" id="soon" hidden>A day-wise itinerary for this trek is coming soon. Show your interest below and we'll share the full plan.</div>
+  </section>
+
+  <section class="block shell" id="info-block" hidden>
+    <div class="kicker">GOOD TO KNOW</div>
+    <h2>Before you go</h2>
+    <div class="info-grid" id="info"></div>
+  </section>
+
+  <section class="block shell" id="featured-block" hidden>
+    <div class="kicker">DAY-WISE ITINERARIES</div>
+    <h2>Trips that include this</h2>
+    <p class="lede">Each of these comes with a full day-by-day plan.</p>
+    <div class="cards" id="featured"></div>
+  </section>
+
+  <section class="shell">
+    <div class="interest" id="interest">
+      <div>
+        <h2 id="interest-title">Interested in this trip?</h2>
+        <p>Tell us when you'd like to travel and how many of you are coming — we'll get back to you with a plan and a quote.</p>
+      </div>
+      <form id="interest-form" novalidate>
+        <label>YOUR NAME
+          <input type="text" id="f-name" autocomplete="name" required>
+        </label>
+        <label>TRAVEL DATE
+          <input type="date" id="f-date">
+        </label>
+        <label>TRAVELLERS
+          <input type="number" id="f-people" min="1" max="30" value="2">
+        </label>
+        <div class="actions">
+          <button class="cta" type="submit">Show interest →</button>
+          <span class="note">Opens WhatsApp with your details filled in. Nothing is saved on this site.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">
+    <span>incredible.sikkim — design prototype, sample rates only</span>
+    <span>Itineraries from incrediblesikkim.com · Photos: Wikimedia Commons contributors (CC BY / CC BY-SA / PD)</span>
+    <span>Tourism · Trekking · Prices in ₹ $ €</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="shared.js"></script>
+<script src="trips.js"></script>
+<script>
+  var currency = loadCurrency();
+  var id = new URLSearchParams(location.search).get('id');
+  var trip = window.TRIPS.find(function (t) { return t.id === id; });
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderPrice() {
+    var box = document.getElementById('price');
+    box.innerHTML = '';
+    box.appendChild(document.createTextNode('From '));
+    box.appendChild(el('b', null, fmtFrom(trip.from, currency)));
+    var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== currency; })
+      .map(function (c) { return '≈ ' + fmtFrom(trip.from, c); }).join(' · ');
+    box.appendChild(document.createTextNode(' per person · ' + others));
+    document.querySelectorAll('.currency button').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.cur === currency);
+    });
+    if (trip.featuredIn) renderFeatured();
+  }
+
+  function renderFeatured() {
+    var box = document.getElementById('featured');
+    box.innerHTML = '';
+    trip.featuredIn.forEach(function (fid) {
+      var t = window.TRIPS.find(function (x) { return x.id === fid; });
+      if (t) box.appendChild(buildTripCard(t, currency));
+    });
+  }
+
+  function renderDay(d) {
+    var li = el('li', 'tday');
+    var badge = el('div', 'badge');
+    badge.appendChild(el('small', null, 'DAY'));
+    badge.appendChild(el('span', null, String(d.n)));
+    li.appendChild(badge);
+
+    var c = el('div', 'content');
+    c.appendChild(el('h3', null, d.title));
+    if (d.meta.length) {
+      var m = el('div', 'dmeta');
+      d.meta.forEach(function (x) { m.appendChild(el('span', null, x)); });
+      c.appendChild(m);
+    }
+    d.blocks.forEach(function (b) {
+      if (b.p) c.appendChild(el('p', null, b.p));
+      else if (b.h) c.appendChild(el('h4', null, b.h));
+      else if (b.li) {
+        var ul = el('ul');
+        b.li.forEach(function (it) {
+          var item = el('li');
+          if (it.label) {
+            item.appendChild(el('b', null, it.label));
+            item.appendChild(document.createTextNode(' — ' + it.text));
+          } else item.textContent = it.text;
+          ul.appendChild(item);
+        });
+        c.appendChild(ul);
+      }
+    });
+    if (d.stay) {
+      var s = el('div', 'stay');
+      s.innerHTML = '<svg width="15" height="15" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.5 10.6A5.5 5.5 0 0 1 5.4 2.5 5.5 5.5 0 1 0 11.5 10.6Z" fill="none" stroke="#23663a" stroke-width="1.5"></path></svg>';
+      s.appendChild(document.createTextNode('Overnight: ' + d.stay));
+      c.appendChild(s);
+    }
+    li.appendChild(c);
+    return li;
+  }
+
+  function render() {
+    if (!trip) return;
+    document.title = trip.title + ' — incredible.sikkim';
+    var cover = document.getElementById('cover');
+    cover.src = trip.img.replace('/960px-', '/1920px-');
+    cover.onerror = function () { cover.onerror = null; cover.src = trip.img; };
+    cover.alt = trip.alt;
+
+    var back = document.getElementById('back');
+    back.href = 'index.html#' + trip.section;
+    back.textContent = trip.section === 'trekking' ? '← All treks' : '← All tours';
+    document.getElementById('title').textContent = trip.title;
+    document.getElementById('subtitle').textContent = trip.subtitle;
+    var chips = document.getElementById('chips');
+    chips.innerHTML = '';
+    trip.chips.forEach(function (c) { chips.appendChild(el('span', c.hard ? 'hard' : null, c.t)); });
+
+    var ov = document.getElementById('overview');
+    trip.overview.forEach(function (p) { ov.appendChild(el('p', null, p)); });
+    var facts = document.getElementById('facts');
+    trip.facts.forEach(function (f) {
+      var box = el('div', 'fact');
+      box.appendChild(el('span', 'k', f.k));
+      box.appendChild(el('span', 'v', f.v));
+      facts.appendChild(box);
+    });
+
+    if (trip.days.length) {
+      document.getElementById('itinerary-title').textContent =
+        trip.days.length + ' days, day by day';
+      var tl = document.getElementById('timeline');
+      trip.days.forEach(function (d) { tl.appendChild(renderDay(d)); });
+    } else if (trip.kind === 'trek') {
+      document.getElementById('soon').hidden = false;
+    } else {
+      document.getElementById('itinerary-block').hidden = true;
+    }
+
+    if (trip.sections.length) {
+      document.getElementById('info-block').hidden = false;
+      var info = document.getElementById('info');
+      trip.sections.forEach(function (s) {
+        var box = el('div', 'info');
+        box.appendChild(el('h3', null, s.title));
+        s.paras.forEach(function (p) { box.appendChild(el('p', null, p)); });
+        if (s.items.length) {
+          var ul = el('ul');
+          s.items.forEach(function (it) { ul.appendChild(el('li', null, it)); });
+          box.appendChild(ul);
+        }
+        info.appendChild(box);
+      });
+    }
+
+    if (trip.featuredIn) document.getElementById('featured-block').hidden = false;
+    document.getElementById('interest-title').textContent = 'Interested in ' + trip.title + '?';
+
+    var today = new Date();
+    var iso = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    document.getElementById('f-date').min = iso;
+
+    document.getElementById('main').hidden = false;
+    renderPrice();
+  }
+
+  document.querySelectorAll('.currency button').forEach(function (b) {
+    b.onclick = function () {
+      currency = b.dataset.cur;
+      saveCurrency(currency);
+      if (trip) renderPrice();
+    };
+  });
+  document.getElementById('signin').onclick = function () {
+    toast('Accounts (email login, trip history, bookings) arrive with the full build.');
+  };
+
+  document.getElementById('interest-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('f-name');
+    if (!name.value.trim()) {
+      name.focus();
+      toast('Please add your name so we know who to reply to.');
+      return;
+    }
+    var date = document.getElementById('f-date').value;
+    var people = document.getElementById('f-people').value;
+    var dateTxt = date
+      ? new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : 'Flexible';
+    var msg = 'Hi Incredible Sikkim! I am interested in: ' + trip.title +
+      (trip.days.length ? ' (' + (trip.days.length - 1) + 'N/' + trip.days.length + 'D)' : '') + '\n' +
+      'Name: ' + name.value.trim() + '\n' +
+      'Travel date: ' + dateTxt + '\n' +
+      'Travellers: ' + (people || 'Not sure yet') + '\n' +
+      'Seen at: ' + location.href;
+    var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+    var w = window.open(url, '_blank', 'noopener');
+    if (!w) location.href = url;
+    toast('Opening WhatsApp…');
+  });
+
+  if (trip) render();
+  else document.querySelectorAll('.currency button').forEach(function (b) {
+    b.classList.toggle('active', b.dataset.cur === currency);
+  });
+</script>
+</body>
+</html>

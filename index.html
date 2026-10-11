@@ -5,166 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>incredible.sikkim — Prototype</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-<style>
-  :root {
-    --night: #1d1f4e; --night-deep: #151738; --night-mid: #2b2e6b;
-    --cream: #fdfaf5; --ink: #1d1f4e; --lavender: #cfd0e8;
-    --sun: #f2a154; --coral: #e2622b; --line: #d5d3ce; --muted: #8a8894;
-    --chip: #e9e9f7;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--cream); color: var(--ink); font-family: 'Work Sans', 'Helvetica Neue', sans-serif; }
-  h1, h2, h3, .num { font-family: 'Space Grotesk', sans-serif; }
-  a { color: inherit; text-decoration: none; }
-  button { font-family: inherit; cursor: pointer; }
-  .shell { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* ---------- Header / hero ---------- */
-  .sky { background: var(--night); color: var(--cream); position: relative; overflow: hidden; }
-  .sky svg.backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .sky > .shell { position: relative; }
-  nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; flex-wrap: wrap; }
-  .wordmark { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
-  .wordmark span { color: var(--sun); }
-  .pills { display: flex; gap: 6px; background: rgba(253,250,245,0.08); border-radius: 999px; padding: 5px; }
-  .pills a { padding: 9px 20px; border-radius: 999px; font-size: 14px; }
-  .pills a:hover { background: rgba(253,250,245,0.14); }
-  .nav-right { display: flex; gap: 12px; align-items: center; }
-  .currency { display: flex; gap: 2px; background: rgba(253,250,245,0.08); border-radius: 999px; padding: 4px; }
-  .currency button { border: 0; background: transparent; color: var(--cream); font-size: 12.5px; font-weight: 600; border-radius: 999px; padding: 7px 12px; }
-  .currency button.active { background: var(--sun); color: var(--night); }
-  .signin { border: 0; background: var(--cream); color: var(--night); border-radius: 999px; padding: 11px 22px; font-size: 14px; font-weight: 600; }
-  .hero { text-align: center; padding: 52px 0 8px 0; display: flex; flex-direction: column; align-items: center; gap: 18px; }
-  .hero h1 { font-size: clamp(38px, 5.2vw, 62px); line-height: 1.06; font-weight: 700; margin: 0; max-width: 820px; text-wrap: balance; }
-  .hero p { margin: 0; font-size: 18px; line-height: 1.6; color: var(--lavender); max-width: 620px; }
-
-  /* ---------- Estimator ---------- */
-  .estimator { position: relative; background: var(--cream); color: var(--ink); border-radius: 22px; padding: 24px 26px; margin: 36px auto 0 auto; max-width: 980px; box-shadow: 0 30px 60px rgba(9,10,32,0.45); display: flex; flex-direction: column; gap: 18px; text-align: left; }
-  .mode { display: flex; gap: 8px; flex-wrap: wrap; }
-  .mode button, .origin button { border: 1.5px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 9px 22px; font-size: 14px; font-weight: 500; }
-  .mode button.active, .origin button.active { background: var(--night); border-color: var(--night); color: var(--cream); }
-  .origin { margin-left: auto; display: flex; gap: 6px; align-items: center; }
-  .origin .lbl { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; margin-right: 4px; }
-  .origin button { padding: 7px 14px; font-size: 13px; }
-  .fields { display: grid; grid-template-columns: 1fr 1.2fr 2fr; gap: 14px; }
-  .field { border: 1.5px solid var(--line); border-radius: 15px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
-  .field .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; color: var(--muted); }
-  .stepper { display: flex; align-items: center; gap: 14px; }
-  .stepper button { width: 30px; height: 30px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1; }
-  .stepper .num { font-size: 20px; font-weight: 600; min-width: 64px; }
-  .opts { display: flex; gap: 6px; flex-wrap: wrap; }
-  .opts button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500; color: var(--ink); }
-  .opts button.active { background: var(--chip); border-color: var(--night); }
-  .opts button:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
-  .est-foot { display: flex; align-items: center; gap: 20px; border-top: 1.5px solid #eceae4; padding-top: 16px; flex-wrap: wrap; }
-  .est-total { display: flex; flex-direction: column; gap: 2px; }
-  .est-total .num { font-size: 26px; font-weight: 700; }
-  .est-total .sub { font-size: 13px; color: var(--muted); }
-  .breakdown-toggle { border: 0; background: transparent; font-size: 13.5px; font-weight: 600; color: var(--coral); padding: 0; }
-  .cta { margin-left: auto; border: 0; background: var(--coral); color: var(--cream); border-radius: 15px; padding: 17px 28px; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; }
-  .cta:hover { background: #c9531f; }
-  .breakdown { display: none; border-top: 1.5px dashed #eceae4; padding-top: 14px; }
-  .breakdown.open { display: block; }
-  .breakdown table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .breakdown td { padding: 5px 0; }
-  .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
-  .breakdown .fine { font-size: 12.5px; color: var(--muted); padding-top: 10px; line-height: 1.5; }
-  .trust { position: relative; display: flex; justify-content: center; gap: 40px; padding: 34px 0 46px 0; font-size: 14.5px; color: var(--lavender); flex-wrap: wrap; }
-  .trust span { display: flex; align-items: center; gap: 8px; }
-
-  /* ---------- Content sections ---------- */
-  section.block { padding: 72px 0 12px 0; }
-  .block .kicker { font-size: 12.5px; letter-spacing: 0.22em; font-weight: 600; color: var(--coral); }
-  .block h2 { font-size: clamp(28px, 3.4vw, 40px); margin: 8px 0 10px 0; line-height: 1.12; }
-  .block .lede { font-size: 16.5px; line-height: 1.6; color: #55536a; max-width: 640px; margin: 0; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
-  .card { background: #fff; border: 1.5px solid #ece9e2; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
-  .card .art { aspect-ratio: 16 / 9; display: block; width: 100%; object-fit: cover; background: var(--night-mid); }
-  .card .body { padding: 16px 18px 18px 18px; display: flex; flex-direction: column; gap: 6px; }
-  .card h3 { margin: 0; font-size: 18.5px; }
-  .card p { margin: 0; font-size: 14px; line-height: 1.55; color: #55536a; }
-  .meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
-  .meta span { font-size: 12px; font-weight: 600; background: var(--chip); border-radius: 999px; padding: 4px 10px; }
-  .meta .hard { background: #fbe3d6; color: #a33f12; }
-
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
-  .step { position: relative; border-top: 3px solid var(--sun); background: #fff; border-radius: 0 0 16px 16px; border-left: 1.5px solid #ece9e2; border-right: 1.5px solid #ece9e2; border-bottom: 1.5px solid #ece9e2; padding: 20px; }
-  .ribbon { position: absolute; top: -13px; right: 14px; background: var(--coral); color: var(--cream); border-radius: 999px; padding: 5px 13px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; box-shadow: 0 4px 10px rgba(226,98,43,0.35); }
-  .tagrow { display: flex; gap: 10px; align-items: center; margin: 12px 0 2px 0; flex-wrap: wrap; }
-  .tagrow span { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: #23663a; background: #e2f0e6; border-radius: 999px; padding: 7px 14px; }
-  .opts .pop { background: #fbe3d6; color: #a33f12; border-radius: 999px; padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: 0.07em; margin-left: 7px; }
-  .step .n { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--coral); font-size: 14px; letter-spacing: 0.12em; }
-  .step h3 { margin: 8px 0 6px 0; font-size: 18px; }
-  .step p { margin: 0; font-size: 14px; line-height: 1.55; color: #55536a; }
-
-  .permits { background: var(--night); color: var(--cream); border-radius: 20px; padding: 32px 34px; margin-top: 64px; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-  .permits h3 { margin: 0 0 6px 0; font-size: 21px; }
-  .permits p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--lavender); max-width: 680px; }
-  .permits .flag { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; color: var(--sun); }
-
-  footer { margin-top: 72px; background: var(--night-deep); color: var(--lavender); }
-  footer .shell { display: flex; justify-content: space-between; gap: 20px; padding: 30px 24px; font-size: 13.5px; flex-wrap: wrap; }
-
-  .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(80px); background: var(--night); color: var(--cream); border-radius: 12px; padding: 13px 20px; font-size: 14px; box-shadow: 0 12px 30px rgba(9,10,32,0.35); opacity: 0; transition: transform 0.25s ease, opacity 0.25s ease; pointer-events: none; max-width: 90vw; }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
-  button:focus-visible, a:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
-
-  /* ---------- Hero photo-reveal layers ---------- */
-  .sky img.reveal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; filter: brightness(0.9) saturate(1.05); display: none; }
-  canvas#scratch { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
-
-  /* ---------- Date field & calendar ---------- */
-  .date-btn { border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--ink); text-align: left; }
-  .date-btn .num { font-size: 19px; font-weight: 600; }
-  .cal { position: absolute; top: calc(100% + 8px); left: 0; z-index: 40; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; box-shadow: 0 18px 44px rgba(9,10,32,0.18); padding: 14px 16px; width: min(316px, calc(100vw - 72px)); }
-  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-  .cal-head button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; width: 28px; height: 28px; font-size: 15px; line-height: 1; color: var(--ink); }
-  .cal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; }
-  .cal-season { font-size: 11.5px; font-weight: 600; margin: 2px 0 8px 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-  .cal-season .badge { border-radius: 999px; padding: 3px 10px; background: var(--chip); }
-  .cal-season .badge.peak { background: #fbe3d6; color: #a33f12; }
-  .cal-season .badge.festive { background: #f6c7ad; color: #8a2f08; }
-  .cal-season .badge.low { background: #e2f0e6; color: #23663a; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-grid .dow { font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: center; padding: 4px 0; letter-spacing: 0.05em; }
-  .cal-grid .dow.we { color: #a33f12; }
-  .cal-grid button { border: 0; background: transparent; border-radius: 9px; font-size: 13px; padding: 7px 0; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .cal-grid button.s-peak { background: #fdf1e9; }
-  .cal-grid button.s-festive { background: #f9d9c6; }
-  .cal-grid button.s-low { background: #eef6f0; }
-  .cal-grid button.we { font-weight: 700; color: #a33f12; }
-  .cal-grid button:hover { outline: 1.5px solid var(--night); }
-  .cal-grid button.sel { background: var(--night); color: var(--cream); }
-  .cal-grid button:disabled { color: #c9c6bd; background: transparent; }
-  .cal-foot { font-size: 11.5px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
-
-  @media (max-width: 860px) {
-    .fields { grid-template-columns: 1fr; }
-    .fields > .field { grid-column: auto !important; }
-    .origin { margin-left: 0; }
-    .pills { order: 3; width: 100%; justify-content: center; }
-    .trust { gap: 18px; }
-  }
-  @media (max-width: 560px) {
-    .shell { padding-left: 18px; padding-right: 18px; }
-    nav { padding: 16px 0; gap: 10px; }
-    .pills a { padding: 8px 14px; font-size: 13px; }
-    .currency button { padding: 6px 9px; font-size: 11.5px; }
-    .signin { padding: 10px 16px; font-size: 13.5px; }
-    .hero { padding-top: 34px; gap: 14px; }
-    .hero p { font-size: 16px; }
-    .estimator { padding: 18px 16px; margin-top: 28px; border-radius: 18px; }
-    .origin .lbl { display: none; }
-    .est-foot { flex-direction: column; align-items: stretch; gap: 12px; }
-    .breakdown-toggle { text-align: left; }
-    .cta { margin-left: 0; text-align: center; }
-    .trust { flex-direction: column; align-items: flex-start; gap: 12px; padding: 26px 0 34px 0; }
-    section.block { padding: 52px 0 8px 0; }
-    .permits { padding: 24px 22px; margin-top: 44px; }
-    footer .shell { flex-direction: column; gap: 8px; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -262,7 +103,7 @@
       <div class="est-foot">
         <div class="est-total">
           <span class="num" id="est-range">—</span>
-          <span class="sub" id="est-sub">per person, estimated</span>
+          <span class="sub" id="est-sub">per person</span>
         </div>
         <button class="breakdown-toggle" id="bd-toggle">See the breakdown ▸</button>
         <button class="cta" id="cta">Get my estimate →</button>
@@ -270,7 +111,7 @@
 
       <div class="breakdown" id="breakdown">
         <table id="bd-table"></table>
-        <div class="fine">Estimates only — real trips vary with season, group size and operator. Figures in this prototype are sample rates; currency conversion is approximate. Exact quotes come from local operators when you book.</div>
+        <div class="fine">Starting prices only — real trips vary with season, group size and operator. Figures in this prototype are sample rates; currency conversion is approximate. Exact quotes come from local operators when you book.</div>
       </div>
     </div>
 
@@ -286,120 +127,7 @@
   <div class="kicker">TOURISM</div>
   <h2>Valleys, lakes &amp; monasteries</h2>
   <p class="lede">Road journeys at your own pace — Gangtok's monasteries, the frozen shore of Tsomgo, and the flower valleys of the north.</p>
-  <div class="cards">
-    <div class="card">
-      <img class="art" loading="lazy" alt="Bird's-eye view of Gangtok city on the hillside" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg/960px-Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg">
-      <div class="body">
-        <h3>Gangtok &amp; around</h3>
-        <p>Rumtek and Enchey monasteries, MG Marg, the Teesta cable car and momo kitchens.</p>
-        <div class="meta"><span>2–3 days</span><span>Easy pace</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Tsomgo Lake ringed by mountains" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg/960px-Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg">
-      <div class="body">
-        <h3>Tsomgo Lake</h3>
-        <p>A glacial lake at 3,753 m that freezes blue-white in winter — yaks and prayer flags included.</p>
-        <div class="meta"><span>Day trip</span><span>Permit needed</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Bridge over the river in Yumthang Valley" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg/960px-Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg">
-      <div class="body">
-        <h3>Lachung &amp; Yumthang</h3>
-        <p>North Sikkim's valley of flowers, hot springs and the road to Zero Point at 4,600 m.</p>
-        <div class="meta"><span>2-day add-on</span><span>Seasonal</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Kanchenjunga seen from Pelling" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Kanchenjunga_View_from_Pelling_Hotel.jpg/960px-Kanchenjunga_View_from_Pelling_Hotel.jpg">
-      <div class="body">
-        <h3>Pelling &amp; the west</h3>
-        <p>Pemayangtse monastery, the glass skywalk, and the classic dawn view of Kanchenjunga.</p>
-        <div class="meta"><span>2 days</span><span>Best Oct–Dec</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Kanchenjunga rising above the roofs of Darjeeling" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Kanchenjunga_above_roofs_of_Darjeeling_1.jpg/960px-Kanchenjunga_above_roofs_of_Darjeeling_1.jpg">
-      <div class="body">
-        <h3>Darjeeling, Pelling &amp; Gangtok</h3>
-        <p>A romantic circuit — Tiger Hill sunrise, Pelling's monasteries and skywalk, Temi Tea Garden and Tsomgo Lake.</p>
-        <div class="meta"><span>7N / 8D</span><span>Honeymoon &amp; couple</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="The Old Silk Route winding through Zuluk" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Sikkim_Zuluk_%2C_Old_Silk_Route.jpg/960px-Sikkim_Zuluk_%2C_Old_Silk_Route.jpg">
-      <div class="body">
-        <h3>Silk Route expedition</h3>
-        <p>Aritar, Padamchen, Zuluk's 32 hairpin bends, Nathang Valley and Kupup — the ancient Indo-Tibet trade route.</p>
-        <div class="meta"><span>7N / 8D</span><span>Adventure &amp; nature</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Gurudongmar Lake below snow peaks" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Gurudongmar_Lake%2C_India.jpg/960px-Gurudongmar_Lake%2C_India.jpg">
-      <div class="body">
-        <h3>Enchanting Gangtok &amp; North Sikkim</h3>
-        <p>Gangtok's sights, then Lachen, Gurudongmar Lake at 17,800 ft and the Yumthang "Valley of Flowers".</p>
-        <div class="meta"><span>5N / 6D</span><span>Classic &amp; family</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Mountain landscape on the way from Lachung to Yumthang Valley" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg/960px-Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg">
-      <div class="body">
-        <h3>Discover North Sikkim</h3>
-        <p>Lachen, Gurudongmar, Yumthang and Zero Point, then Tsomgo Lake and Baba Mandir — the north without the rush.</p>
-        <div class="meta"><span>7N / 8D</span><span>Adventure &amp; nature</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Giant Buddha statue at Buddha Park, Ravangla" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Buddha_statue_at_Buddha_Park_of_Ravangla%2C_Sikkim%2C_India_%281%29.jpg/960px-Buddha_statue_at_Buddha_Park_of_Ravangla%2C_Sikkim%2C_India_%281%29.jpg">
-      <div class="body">
-        <h3>South &amp; East Sikkim spiritual circuit</h3>
-        <p>Tsomgo Lake, Rumtek, Temi Tea Garden, Namchi's Char Dham and Samdruptse, and Ravangla's Buddha Park.</p>
-        <div class="meta"><span>4N / 5D</span><span>Classic &amp; family</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Panoramic view of Yuksom, West Sikkim" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Panoramic_view_of_Yuksom%2C_West_Sikkim%2C_in_India.jpg/960px-Panoramic_view_of_Yuksom%2C_West_Sikkim%2C_in_India.jpg">
-      <div class="body">
-        <h3>West Sikkim heritage trails</h3>
-        <p>Pelling, Yuksom, Rinchenpong, Ravangla and Namchi — Pemayangtse, Tashiding and the Singshore Bridge.</p>
-        <div class="meta"><span>6N / 7D</span><span>Classic &amp; family</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Tea bushes on the slopes of Temi Tea Garden" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Temi_tea_garden.jpg/960px-Temi_tea_garden.jpg">
-      <div class="body">
-        <h3>Gangtok, Pelling &amp; South Sikkim</h3>
-        <p>Gangtok's highlights, Namchi and Ravangla, then a full day of Pelling's monasteries, lakes and waterfalls.</p>
-        <div class="meta"><span>4N / 5D</span><span>Classic &amp; family</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Darjeeling toy train at Batasia Loop" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Darjeeling_Toy_Train_at_Batasia_Loop.jpg/960px-Darjeeling_Toy_Train_at_Batasia_Loop.jpg">
-      <div class="body">
-        <h3>Darjeeling &amp; Gangtok delight</h3>
-        <p>Toy train, Tiger Hill sunrise and Ghoom Monastery in Darjeeling, then Tsomgo Lake and MG Marg in Gangtok.</p>
-        <div class="meta"><span>4N / 5D</span><span>Classic &amp; family</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Nathang village in Nathang Valley, East Sikkim" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Nathang_village_in_Nathang_%28Gnathang%29_Valley%2C_East_Sikkim_01.jpg/960px-Nathang_village_in_Nathang_%28Gnathang%29_Valley%2C_East_Sikkim_01.jpg">
-      <div class="body">
-        <h3>Bike ride: Silk Route loop</h3>
-        <p>Gangtok, Tsomgo Lake, Nathula Pass, Zuluk, Kupup and Aritar on two wheels. Best April–June and October–November.</p>
-        <div class="meta"><span>4N / 5D</span><span>Bike ride</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Snowfields at Zero Point, Yumesamdong" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Zero_Point%2C_Yumesamdong%2C_North_Sikkim.jpg/960px-Zero_Point%2C_Yumesamdong%2C_North_Sikkim.jpg">
-      <div class="body">
-        <h3>Bike ride: North Sikkim</h3>
-        <p>Lachen, Gurudongmar Lake, Lachung, Yumthang Valley and Zero Point by motorbike. Moderate to challenging.</p>
-        <div class="meta"><span>5N / 6D</span><span>Bike ride</span></div>
-      </div>
-    </div>
-  </div>
+  <div class="cards" id="tour-cards"></div>
 </section>
 
 <section class="block shell" id="sathi">
@@ -432,97 +160,8 @@
 <section class="block shell" id="trekking">
   <div class="kicker">TREKKING</div>
   <h2>Dzongri, Goechala &amp; beyond</h2>
-  <p class="lede">Guided multi-day treks with local crews — graded honestly, priced as ranges, permits arranged for foreign trekkers.</p>
-  <div class="cards">
-    <div class="card">
-      <img class="art" loading="lazy" alt="On the Goechala trek" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Goechala_Trek.jpg/960px-Goechala_Trek.jpg">
-      <div class="body">
-        <h3>Goechala</h3>
-        <p>Sikkim's most celebrated trek — rhododendron forest, Dzongri, Thansing and Samiti Lake to a face-to-face sunrise with Kanchenjunga.</p>
-        <div class="meta"><span>9–11 days</span><span class="hard">Moderate–difficult</span><span>16,200 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Mount Narsing seen from Dzongri" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Mt._Narsing_from_Dzongri_DSC04018.jpg/960px-Mt._Narsing_from_Dzongri_DSC04018.jpg">
-      <div class="body">
-        <h3>Dzongri</h3>
-        <p>A shorter Goechala — oak, birch and rhododendron forest up to Dzongri Top's 360° view of the Eastern Himalayas.</p>
-        <div class="meta"><span>5–6 days</span><span class="hard">Moderate</span><span>13,780 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Kanchenjunga from the Singalila ridge trail" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg/960px-Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg">
-      <div class="body">
-        <h3>Singalila ridge</h3>
-        <p>Along the Indo-Nepal border with Everest and Kanchenjunga in view, through Barsey's rhododendrons — quiet and uncrowded.</p>
-        <div class="meta"><span>8–9 days</span><span class="hard">Moderate</span><span>12,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Kanchenjunga east face above the Zemu glacier" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kangchenjunga_East_Face_from_Zemu_Glacier.jpg/960px-Kangchenjunga_East_Face_from_Zemu_Glacier.jpg">
-      <div class="body">
-        <h3>Green Lake</h3>
-        <p>Sikkim's most remote trail, from Lachen to the base of Kanchenjunga — red pandas, blue sheep and a lake that mirrors the peaks.</p>
-        <div class="meta"><span>15–17 days</span><span class="hard">Difficult</span><span>16,200 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="A valley in Kanchenjunga National Park" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/A_scene_from_Kanchendzonga_National_Park%2C_Sikkim_%283%29.jpg/960px-A_scene_from_Kanchendzonga_National_Park%2C_Sikkim_%283%29.jpg">
-      <div class="body">
-        <h3>Kanchenjunga Base Camp</h3>
-        <p>Jungles, suspension bridges and remote mountain villages to the foot of the world's third-highest mountain.</p>
-        <div class="meta"><span>10–12 days</span><span class="hard">Challenging</span><span>16,900 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Morning light on Mount Kabru" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Morning_Light_on_Kabru_%28Kangchenjunga_Himal%29.jpg/960px-Morning_Light_on_Kabru_%28Kangchenjunga_Himal%29.jpg">
-      <div class="body">
-        <h3>Yambong Singalila</h3>
-        <p>A hidden gem from Nambu over remote passes and pristine valleys, with both Kanchenjunga and Makalu in view.</p>
-        <div class="meta"><span>9–10 days</span><span class="hard">Moderate</span><span>13,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Monastery pathway in Upper Dzongu, North Sikkim" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Pathway_to_Tingvong_Monastery_located_in_Upper_Dzongu%2C_North_Sikkim%2C_India.jpg/960px-Pathway_to_Tingvong_Monastery_located_in_Upper_Dzongu%2C_North_Sikkim%2C_India.jpg">
-      <div class="body">
-        <h3>Tholung Monastery</h3>
-        <p>Light hiking through the remote upper Rongyong valley to one of Sikkim's holiest monasteries and its centuries-old relics.</p>
-        <div class="meta"><span>3–4 days</span><span class="hard">Easy–moderate</span><span>8,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Barsey Rhododendron Sanctuary in late April" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Barsey_Rhododendron_Sanctuary_in_late_april.jpg/960px-Barsey_Rhododendron_Sanctuary_in_late_april.jpg">
-      <div class="body">
-        <h3>Varsey rhododendron</h3>
-        <p>Perfect for beginners — over 40 species of rhododendron paint the forest red and pink from March to May.</p>
-        <div class="meta"><span>3–4 days</span><span class="hard">Easy</span><span>10,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Alpine valley in the Kanchenjunga range" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Abhishek532_LamuneyValley.jpg/960px-Abhishek532_LamuneyValley.jpg">
-      <div class="body">
-        <h3>Tosar Lake</h3>
-        <p>An offbeat trail through dense forest and alpine plateaus to pristine Tosar Lake, facing Pandim, Kabru and Kanchenjunga.</p>
-        <div class="meta"><span>6–7 days</span><span class="hard">Moderate</span><span>13,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Rhododendron in bloom at Shingba sanctuary" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Rhododendron_niveum%2C_Shingba_RS_AJT_J.jpg/960px-Rhododendron_niveum%2C_Shingba_RS_AJT_J.jpg">
-      <div class="body">
-        <h3>Rhododendron trail (Singba)</h3>
-        <p>Yumthang in April–May — over 40 rhododendron varieties, orchids and rare Himalayan flora. Great for families.</p>
-        <div class="meta"><span>4–5 days</span><span class="hard">Easy–moderate</span><span>12,000 ft</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="art" loading="lazy" alt="Log house at Golitar, Fambong Lho sanctuary" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Log_House_at_Golitar_Fambong_Lho_WLS.jpg/960px-Log_House_at_Golitar_Fambong_Lho_WLS.jpg">
-      <div class="body">
-        <h3>Tinjure</h3>
-        <p>A quiet forest trail in Fambong Lho sanctuary, 20 km from Gangtok, to a ridge over the Teesta valley. Best October–May.</p>
-        <div class="meta"><span>2–3 days</span><span class="hard">Easy–moderate</span><span>7,500 ft</span></div>
-      </div>
-    </div>
-  </div>
+  <p class="lede">Guided multi-day treks with local crews — graded honestly, clear starting prices, permits arranged for foreign trekkers.</p>
+  <div class="cards" id="trek-cards"></div>
 </section>
 
 <section class="block shell" id="how">
@@ -532,7 +171,7 @@
     <div class="step">
       <span class="n">STEP 1</span>
       <h3>Get your estimate</h3>
-      <p>Days, stay and activities in — an honest cost range out, in rupees, dollars or euros. No sign-up needed.</p>
+      <p>Days, stay and activities in — an honest starting price out, in rupees, dollars or euros. No sign-up needed.</p>
     </div>
     <div class="step">
       <span class="n">STEP 2</span>
@@ -559,15 +198,17 @@
   <div class="shell">
     <span>incredible.sikkim — design prototype, sample rates only</span>
     <span>Photos: Wikimedia Commons contributors (CC BY / CC BY-SA / PD)</span>
-    <span>Tourism · Trekking · Estimates in ₹ $ €</span>
+    <span>Tourism · Trekking · Prices in ₹ $ €</span>
   </div>
 </footer>
 
 <div class="toast" id="toast" role="status"></div>
 
+<script src="shared.js"></script>
+<script src="trips.js"></script>
 <script>
   var start = new Date(); start.setDate(start.getDate() + 30);
-  var state = { mode: 'tourism', origin: 'india', days: 7, people: 2, currency: 'INR', stay: 'standard', acts: ['tsomgo'], comp: [], trek: 'dzongri', start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
+  var state = { mode: 'tourism', origin: 'india', days: 7, people: 2, currency: loadCurrency(), stay: 'standard', acts: ['tsomgo'], comp: [], trek: 'dzongri', start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
 
   // Sample seasonal pricing: monthly factor on stay + daily costs, weekends +15%.
   // Seasonal pricing bands, applied per travel day. Spring peak costs more
@@ -665,17 +306,14 @@
   // trek packages already include food and crew).
   var TRANSPORT_FOOD_PER_DAY = 1800;
   var PERMITS = { tourism: { india: 500, abroad: 2500 }, trekking: { india: 1500, abroad: 4500 } };
-  var RATES = { INR: 1, USD: 1 / 88, EUR: 1 / 95 };
-  var SYMBOL = { INR: '₹', USD: '$', EUR: '€' };
-
-  function fmt(inr, cur) {
-    var v = inr * RATES[cur];
-    var rounded = cur === 'INR' ? Math.round(v / 500) * 500 : Math.round(v / 5) * 5;
-    return SYMBOL[cur] + rounded.toLocaleString(cur === 'INR' ? 'en-IN' : 'en-US');
-  }
-  function fmtExact(inr, cur) {
-    var v = Math.round(inr * RATES[cur]);
-    return SYMBOL[cur] + v.toLocaleString(cur === 'INR' ? 'en-IN' : 'en-US');
+  function renderTripCards() {
+    [['tourism', 'tour-cards'], ['trekking', 'trek-cards']].forEach(function (pair) {
+      var box = document.getElementById(pair[1]);
+      box.innerHTML = '';
+      window.TRIPS.filter(function (t) { return t.section === pair[0]; }).forEach(function (t) {
+        box.appendChild(buildTripCard(t, state.currency));
+      });
+    });
   }
 
   function tripDates() {
@@ -810,7 +448,7 @@
     ACTS[state.mode].forEach(function (a) {
       var b = document.createElement('button');
       b.textContent = alc
-        ? a.label + ' · ' + fmtExact(a.cost, state.currency) + (a.perVehicle ? '/cab' : '/person')
+        ? a.label + ' · from ' + fmtExact(a.cost, state.currency) + (a.perVehicle ? '/cab' : '/person')
         : a.label;
       var blocked = a.indiaOnly && state.origin === 'abroad';
       if (blocked) {
@@ -843,7 +481,7 @@
       compBox.innerHTML = '';
       COMPANION.forEach(function (c) {
         var b = document.createElement('button');
-        b.textContent = c.label + ' · ' + fmtExact(c.cost, state.currency) + (c.perDay ? '/day' : '');
+        b.textContent = c.label + ' · from ' + fmtExact(c.cost, state.currency) + (c.perDay ? '/day' : '');
         if (c.id === 'assist') {
           var pop = document.createElement('span');
           pop.className = 'pop'; pop.textContent = 'POPULAR';
@@ -866,15 +504,14 @@
 
     var all = lines();
     var total = all.reduce(function (t, l) { return t + l.inr; }, 0);
-    var lo = total * 0.92, hi = total * 1.12;
-    document.getElementById('est-range').textContent = fmt(lo, state.currency) + ' – ' + fmt(hi, state.currency);
+    document.getElementById('est-range').textContent = 'From ' + fmtFrom(total, state.currency);
     var end = new Date(state.start); end.setDate(end.getDate() + state.days - 1);
     var range = alc
       ? state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
       : state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== state.currency; })
-      .map(function (c) { return '≈ ' + fmt(lo, c) + '–' + fmt(hi, c); }).join(' · ');
-    var basis = alc ? 'for ' + state.people + (state.people > 1 ? ' people' : ' person') + ', estimated' : 'per person, estimated';
+      .map(function (c) { return '≈ ' + fmtFrom(total, c); }).join(' · ');
+    var basis = alc ? 'for ' + state.people + (state.people > 1 ? ' people' : ' person') : 'per person';
     document.getElementById('est-sub').textContent = range + ' · ' + basis + ' · ' + others;
 
     var table = document.getElementById('bd-table');
@@ -885,17 +522,9 @@
       var td2 = document.createElement('td');
       if (l.inr === 0) td2.textContent = 'included';
       else if (l.signed) td2.textContent = (l.inr < 0 ? '− ' : '+ ') + fmtExact(Math.abs(l.inr), state.currency);
-      else td2.textContent = fmtExact(l.inr, state.currency);
+      else td2.textContent = 'from ' + fmtExact(l.inr, state.currency);
       tr.appendChild(td1); tr.appendChild(td2); table.appendChild(tr);
     });
-  }
-
-  function toast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function () { t.classList.remove('show'); }, 3200);
   }
 
   document.querySelectorAll('.mode button').forEach(function (b) {
@@ -926,7 +555,7 @@
     };
   });
   document.querySelectorAll('.currency button').forEach(function (b) {
-    b.onclick = function () { state.currency = b.dataset.cur; render(); };
+    b.onclick = function () { state.currency = b.dataset.cur; saveCurrency(state.currency); render(); renderTripCards(); };
   });
   document.getElementById('days-minus').onclick = function () { state.days = Math.max(2, state.days - 1); render(); };
   document.getElementById('days-plus').onclick = function () { state.days = Math.min(21, state.days + 1); render(); };
@@ -1099,6 +728,7 @@
   })();
 
   render();
+  renderTripCards();
 </script>
 </body>
 </html>
