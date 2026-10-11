@@ -261,18 +261,18 @@
 
   var ACTS = {
     tourism: [
-      { id: 'tsomgo', label: 'Tsomgo Lake day trip', cost: 3500 },
-      { id: 'nathula', label: 'Nathula Pass', cost: 2500, indiaOnly: true },
-      { id: 'north', label: 'Lachung–Yumthang (2-day)', cost: 8000 },
-      { id: 'gurudongmar', label: 'Lachen & Gurudongmar Lake (2-day)', cost: 9000 },
-      { id: 'zeropoint', label: 'Zero Point', cost: 3000 },
-      { id: 'silkroute', label: 'Silk Route: Zuluk & Nathang (2-day)', cost: 9000 },
-      { id: 'south', label: 'South Sikkim: Namchi & Ravangla', cost: 4500 },
-      { id: 'pelling', label: 'Pelling & West Sikkim sightseeing', cost: 4000 },
-      { id: 'darjeeling', label: 'Darjeeling: Tiger Hill & toy train', cost: 5500 },
-      { id: 'monasteries', label: 'Monastery circuit', cost: 1500 },
-      { id: 'cablecar', label: 'Cable car & city', cost: 800 },
-      { id: 'rafting', label: 'Teesta rafting', cost: 1800 }
+      { id: 'tsomgo', label: 'Tsomgo Lake (1 day)', cost: 3500, days: 1 },
+      { id: 'nathula', label: 'Nathula Pass (with Tsomgo)', cost: 2500, days: 0, indiaOnly: true, requires: 'tsomgo' },
+      { id: 'north', label: 'Lachung–Yumthang (2 days)', cost: 8000, days: 2 },
+      { id: 'gurudongmar', label: 'Lachen & Gurudongmar Lake (2 days)', cost: 9000, days: 2 },
+      { id: 'zeropoint', label: 'Zero Point (from Lachung)', cost: 3000, days: 0, requires: 'north' },
+      { id: 'silkroute', label: 'Silk Route: Zuluk & Nathang (2 days)', cost: 9000, days: 2 },
+      { id: 'south', label: 'South Sikkim: Namchi & Ravangla (1 day)', cost: 4500, days: 1 },
+      { id: 'pelling', label: 'Pelling & West Sikkim (2 days)', cost: 4000, days: 2 },
+      { id: 'darjeeling', label: 'Darjeeling: Tiger Hill & toy train (2 days)', cost: 5500, days: 2 },
+      { id: 'monasteries', label: 'Monastery circuit (half day)', cost: 1500, days: 0.5 },
+      { id: 'cablecar', label: 'Cable car & city (half day)', cost: 800, days: 0.5 },
+      { id: 'rafting', label: 'Teesta rafting (half day)', cost: 1800, days: 0.5 }
     ],
     trekking: [
       { id: 'gear', label: 'Gear rental', cost: 2500 },
@@ -287,6 +287,42 @@
     ]
   };
   var CAB_SEATS = 4; // sample: one cab carries up to 4
+
+  // Lachen–Gurudongmar and Lachung–Yumthang share a day: Gangtok → Lachen,
+  // Lachen → Gurudongmar → Lachung, Lachung → Yumthang → Gangtok.
+  var NORTH_COMBO_SAVES = 1;
+
+  function tourismAct(id) { return ACTS.tourism.find(function (x) { return x.id === id; }); }
+  function daysPlanned(acts) {
+    var total = acts.reduce(function (t, id) { var a = tourismAct(id); return t + (a ? a.days : 0); }, 0);
+    if (acts.indexOf('north') !== -1 && acts.indexOf('gurudongmar') !== -1) total -= NORTH_COMBO_SAVES;
+    return total;
+  }
+  function fmtDays(n) { return (n % 1 ? n.toFixed(1) : String(n)) + (n === 1 ? ' day' : ' days'); }
+
+  // Drops activities whose prerequisite is gone, then the most recently added
+  // ones until the plan fits the trip. Returns the labels it removed.
+  function fitActsToDays() {
+    var removed = [];
+    function dropOrphans() {
+      state.acts = state.acts.filter(function (id) {
+        var a = tourismAct(id);
+        var ok = !(a && a.requires && state.acts.indexOf(a.requires) === -1);
+        if (!ok) removed.push(a.label);
+        return ok;
+      });
+    }
+    dropOrphans();
+    while (state.acts.length && daysPlanned(state.acts) > state.days) {
+      var used = daysPlanned(state.acts), idx = state.acts.length - 1;
+      for (var i = state.acts.length - 1; i >= 0; i--) {
+        if (daysPlanned(state.acts.slice(0, i).concat(state.acts.slice(i + 1))) < used) { idx = i; break; }
+      }
+      removed.push(tourismAct(state.acts.splice(idx, 1)[0]).label);
+      dropOrphans();
+    }
+    return removed;
+  }
 
   var TREKS = [
     { id: 'goechala', label: 'Goechala', days: 10 },
@@ -457,8 +493,24 @@
         b.disabled = true;
         b.title = 'Nathula permits are issued to Indian nationals only';
       }
-      b.classList.toggle('active', state.acts.indexOf(a.id) !== -1);
+      var selected = state.acts.indexOf(a.id) !== -1;
+      var why = '';
+      if (state.mode === 'tourism' && !selected && !blocked) {
+        if (a.requires && state.acts.indexOf(a.requires) === -1) {
+          why = a.label.replace(/ \(.*\)$/, '') + ' is visited from ' + tourismAct(a.requires).label.replace(/ \(.*\)$/, '') + ' — add that first.';
+        } else if (daysPlanned(state.acts.concat(a.id)) > state.days) {
+          var left = Math.max(state.days - daysPlanned(state.acts), 0);
+          var extra = daysPlanned(state.acts.concat(a.id)) - daysPlanned(state.acts);
+          why = a.label.replace(/ \(.*\)$/, '') + ' needs '
+            + (extra < a.days ? fmtDays(extra).replace(/ (days?)$/, ' more $1') + ' alongside your other plans' : fmtDays(extra))
+            + (left ? ', but your ' + state.days + '-day trip has only ' + fmtDays(left) + ' free.' : ' — your ' + state.days + '-day trip is already fully planned.')
+            + ' Add days or remove something.';
+        }
+      }
+      if (why) { b.classList.add('nofit'); b.setAttribute('aria-disabled', 'true'); b.title = why; }
+      b.classList.toggle('active', selected);
       b.onclick = function () {
+        if (why) { toast(why); return; }
         var i = state.acts.indexOf(a.id);
         if (i === -1) {
           if (a.group) {
@@ -468,11 +520,18 @@
             });
           }
           state.acts.push(a.id);
-        } else state.acts.splice(i, 1);
+        } else {
+          state.acts.splice(i, 1);
+          if (state.mode === 'tourism') fitActsToDays();
+        }
         render();
       };
       actBox.appendChild(b);
     });
+    if (state.mode === 'tourism') {
+      document.getElementById('act-label').textContent =
+        'ACTIVITIES · ' + fmtDays(daysPlanned(state.acts)).toUpperCase() + ' OF ' + state.days + ' PLANNED';
+    }
 
     var actField = document.getElementById('act-field');
     var compField = document.getElementById('comp-field');
@@ -561,7 +620,14 @@
   document.querySelectorAll('.currency button').forEach(function (b) {
     b.onclick = function () { state.currency = b.dataset.cur; saveCurrency(state.currency); render(); renderTripCards(); };
   });
-  document.getElementById('days-minus').onclick = function () { state.days = Math.max(2, state.days - 1); render(); };
+  document.getElementById('days-minus').onclick = function () {
+    state.days = Math.max(2, state.days - 1);
+    if (state.mode === 'tourism') {
+      var removed = fitActsToDays();
+      if (removed.length) toast('Removed ' + removed.join(', ') + (removed.length > 1 ? ' — they no longer fit' : ' — it no longer fits') + ' in ' + state.days + ' days.');
+    }
+    render();
+  };
   document.getElementById('days-plus').onclick = function () { state.days = Math.min(21, state.days + 1); render(); };
   document.getElementById('people-minus').onclick = function () { state.people = Math.max(1, state.people - 1); render(); };
   document.getElementById('people-plus').onclick = function () { state.people = Math.min(30, state.people + 1); render(); };

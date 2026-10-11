@@ -48,6 +48,7 @@
   .opts button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 500; color: var(--ink); }
   .opts button.active { background: var(--chip); border-color: var(--night); }
   .opts button:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: line-through; }
+  .opts button.nofit { opacity: 0.45; cursor: not-allowed; }
   .est-foot { display: flex; align-items: center; gap: 20px; border-top: 1.5px solid #eceae4; padding-top: 16px; flex-wrap: wrap; }
   .est-total { display: flex; flex-direction: column; gap: 2px; }
   .est-total .num { font-size: 26px; font-weight: 700; }
