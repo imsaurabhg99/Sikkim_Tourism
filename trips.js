@@ -1,12 +1,11 @@
 // Trip content for the homepage cards and trip.html.
-// Itineraries copied from incrediblesikkim.com. "from" is the starting price per person in INR,
-// computed from the estimator's sample rates — replace with real starting prices.
+// Itineraries copied from incrediblesikkim.com. "pricing" says which estimate a trip's
+// starting price is based on (see startingPrice in pricing.js).
 window.TRIPS = [
  {
   "id": "gangtok",
   "kind": "place",
   "section": "tourism",
-  "from": 8500,
   "title": "Gangtok & around",
   "blurb": "Rumtek and Enchey monasteries, MG Marg, the Teesta cable car and momo kitchens.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg/960px-Bird%27s_eye_view_of_Gangtok_City_from_Ganeshtok.jpg",
@@ -44,13 +43,20 @@ window.TRIPS = [
    "darjeeling-gangtok-delight",
    "south-east-circuit",
    "romantic-circuit"
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 3,
+   "acts": [
+    "monasteries",
+    "cablecar"
+   ]
+  }
  },
  {
   "id": "tsomgo",
   "kind": "place",
   "section": "tourism",
-  "from": 3500,
   "title": "Tsomgo Lake",
   "blurb": "A glacial lake at 3,753 m that freezes blue-white in winter — yaks and prayer flags included.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg/960px-Tsomgo_Lake_%28Changu_Lake%29%2C_East_Sikkim%2C4.jpg",
@@ -88,13 +94,19 @@ window.TRIPS = [
    "romantic-circuit",
    "silk-route",
    "bike-silk-route"
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 1,
+   "acts": [
+    "tsomgo"
+   ]
+  }
  },
  {
   "id": "lachung-yumthang",
   "kind": "place",
   "section": "tourism",
-  "from": 8000,
   "title": "Lachung & Yumthang",
   "blurb": "North Sikkim's valley of flowers, hot springs and the road to Zero Point at 4,600 m.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg/960px-Bridge_over_the_river_in_Yumthang_Valley%2C_North_Sikkim%2C_India.jpg",
@@ -129,13 +141,19 @@ window.TRIPS = [
    "enchanting-gangtok-north",
    "discover-north-sikkim",
    "bike-north-sikkim"
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 2,
+   "acts": [
+    "north"
+   ]
+  }
  },
  {
   "id": "pelling",
   "kind": "place",
   "section": "tourism",
-  "from": 5500,
   "title": "Pelling & the west",
   "blurb": "Pemayangtse monastery, the glass skywalk, and the classic dawn view of Kanchenjunga.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Kanchenjunga_View_from_Pelling_Hotel.jpg/960px-Kanchenjunga_View_from_Pelling_Hotel.jpg",
@@ -170,13 +188,19 @@ window.TRIPS = [
    "romantic-circuit",
    "west-sikkim-heritage",
    "gangtok-pelling-south"
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 2,
+   "acts": [
+    "pelling"
+   ]
+  }
  },
  {
   "id": "romantic-circuit",
   "kind": "tour",
   "section": "tourism",
-  "from": 24500,
   "title": "Darjeeling, Pelling & Gangtok",
   "blurb": "A romantic circuit — Tiger Hill sunrise, Pelling's monasteries and skywalk, Temi Tea Garden and Tsomgo Lake.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Kanchenjunga_above_roofs_of_Darjeeling_1.jpg/960px-Kanchenjunga_above_roofs_of_Darjeeling_1.jpg",
@@ -295,13 +319,22 @@ window.TRIPS = [
     "stay": ""
    }
   ],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "tourism",
+   "days": 8,
+   "acts": [
+    "darjeeling",
+    "pelling",
+    "tsomgo",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "silk-route",
   "kind": "tour",
   "section": "tourism",
-  "from": 24500,
   "title": "Silk Route expedition",
   "blurb": "Aritar, Padamchen, Zuluk's 32 hairpin bends, Nathang Valley and Kupup — the ancient Indo-Tibet trade route.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Sikkim_Zuluk_%2C_Old_Silk_Route.jpg/960px-Sikkim_Zuluk_%2C_Old_Silk_Route.jpg",
@@ -540,13 +573,21 @@ window.TRIPS = [
     ],
     "paras": []
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 8,
+   "acts": [
+    "silkroute",
+    "tsomgo",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "enchanting-gangtok-north",
   "kind": "tour",
   "section": "tourism",
-  "from": 18000,
   "title": "Enchanting Gangtok & North Sikkim",
   "blurb": "Gangtok's sights, then Lachen, Gurudongmar Lake at 17,800 ft and the Yumthang \"Valley of Flowers\".",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Gurudongmar_Lake%2C_India.jpg/960px-Gurudongmar_Lake%2C_India.jpg",
@@ -730,13 +771,21 @@ window.TRIPS = [
      "At Incredible Sikkim, we ensure every traveler experiences the real magic of the mountains — not just sightseeing, but connecting with the heart of Sikkim. From warm local hospitality to safe vehicles and responsible travel practices, your comfort and experience come first. Come, let the Himalayas whisper their stories to you."
     ]
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 6,
+   "acts": [
+    "gurudongmar",
+    "north",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "discover-north-sikkim",
   "kind": "tour",
   "section": "tourism",
-  "from": 24500,
   "title": "Discover North Sikkim",
   "blurb": "Lachen, Gurudongmar, Yumthang and Zero Point, then Tsomgo Lake and Baba Mandir — the north without the rush.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg/960px-Landscape_on_the_way_to_Yumthang_Valley_from_Lachung%2C_North_Sikkim%2C_India_04.jpg",
@@ -983,13 +1032,23 @@ window.TRIPS = [
      "At Incredible Sikkim, we believe travel should touch the soul. This 8-day North Sikkim expedition isn’t just sightseeing — it’s a journey through mountains, myths, and memories. From the sacred Gurudongmar to the blooming Yumthang Valley, every moment is curated to inspire awe and inner peace. We ensure comfort, safety, and sustainability — so you experience the true spirit of the Himalayas, responsibly."
     ]
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 8,
+   "acts": [
+    "gurudongmar",
+    "north",
+    "zeropoint",
+    "tsomgo",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "south-east-circuit",
   "kind": "tour",
   "section": "tourism",
-  "from": 15000,
   "title": "South & East Sikkim spiritual circuit",
   "blurb": "Tsomgo Lake, Rumtek, Temi Tea Garden, Namchi's Char Dham and Samdruptse, and Ravangla's Buddha Park.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Buddha_statue_at_Buddha_Park_of_Ravangla%2C_Sikkim%2C_India_%281%29.jpg/960px-Buddha_statue_at_Buddha_Park_of_Ravangla%2C_Sikkim%2C_India_%281%29.jpg",
@@ -1151,13 +1210,21 @@ window.TRIPS = [
     ],
     "paras": []
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 5,
+   "acts": [
+    "tsomgo",
+    "south",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "west-sikkim-heritage",
   "kind": "tour",
   "section": "tourism",
-  "from": 21500,
   "title": "West Sikkim heritage trails",
   "blurb": "Pelling, Yuksom, Rinchenpong, Ravangla and Namchi — Pemayangtse, Tashiding and the Singshore Bridge.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Panoramic_view_of_Yuksom%2C_West_Sikkim%2C_in_India.jpg/960px-Panoramic_view_of_Yuksom%2C_West_Sikkim%2C_in_India.jpg",
@@ -1392,13 +1459,20 @@ window.TRIPS = [
      "This journey blends heritage, nature, and spirituality — showcasing the soul of Sikkim beyond the usual tourist routes. With Incredible Sikkim, you’ll travel comfortably with local drivers, stay in handpicked eco-lodges, and receive personal attention to detail. Our curated storytelling approach ensures you don’t just visit places — you feel them. From the chanting monks of Pemayangtse to the windswept ridges of Tashiding, every moment is a living postcard from the Himalayas."
     ]
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 7,
+   "acts": [
+    "pelling",
+    "south"
+   ]
+  }
  },
  {
   "id": "gangtok-pelling-south",
   "kind": "tour",
   "section": "tourism",
-  "from": 15000,
   "title": "Gangtok, Pelling & South Sikkim",
   "blurb": "Gangtok's highlights, Namchi and Ravangla, then a full day of Pelling's monasteries, lakes and waterfalls.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Temi_tea_garden.jpg/960px-Temi_tea_garden.jpg",
@@ -1574,13 +1648,21 @@ window.TRIPS = [
     "stay": ""
    }
   ],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "tourism",
+   "days": 5,
+   "acts": [
+    "south",
+    "pelling",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "darjeeling-gangtok-delight",
   "kind": "tour",
   "section": "tourism",
-  "from": 15000,
   "title": "Darjeeling & Gangtok delight",
   "blurb": "Toy train, Tiger Hill sunrise and Ghoom Monastery in Darjeeling, then Tsomgo Lake and MG Marg in Gangtok.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Darjeeling_Toy_Train_at_Batasia_Loop.jpg/960px-Darjeeling_Toy_Train_at_Batasia_Loop.jpg",
@@ -1763,13 +1845,21 @@ window.TRIPS = [
      "Since 2019, Incredible Sikkim has been helping travelers experience the Himalayas with comfort and authenticity. Our Darjeeling–Gangtok tour blends the colonial charm of Darjeeling with the cultural grace of Sikkim, guided by local experts who ensure every journey feels personal. From sunrise at Tiger Hill to the reflection of clouds in Tsomgo Lake, this trip captures the very essence of the Eastern Himalayas."
     ]
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "tourism",
+   "days": 5,
+   "acts": [
+    "darjeeling",
+    "tsomgo",
+    "monasteries"
+   ]
+  }
  },
  {
   "id": "bike-silk-route",
   "kind": "tour",
   "section": "tourism",
-  "from": 15000,
   "title": "Bike ride: Silk Route loop",
   "blurb": "Gangtok, Tsomgo Lake, Nathula Pass, Zuluk, Kupup and Aritar on two wheels. Best April–June and October–November.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Nathang_village_in_Nathang_%28Gnathang%29_Valley%2C_East_Sikkim_01.jpg/960px-Nathang_village_in_Nathang_%28Gnathang%29_Valley%2C_East_Sikkim_01.jpg",
@@ -1872,13 +1962,22 @@ window.TRIPS = [
     "stay": ""
    }
   ],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "tourism",
+   "days": 5,
+   "acts": [
+    "tsomgo",
+    "nathula",
+    "silkroute"
+   ],
+   "transport": "bike"
+  }
  },
  {
   "id": "bike-north-sikkim",
   "kind": "tour",
   "section": "tourism",
-  "from": 18000,
   "title": "Bike ride: North Sikkim",
   "blurb": "Lachen, Gurudongmar Lake, Lachung, Yumthang Valley and Zero Point by motorbike. Moderate to challenging.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Zero_Point%2C_Yumesamdong%2C_North_Sikkim.jpg/960px-Zero_Point%2C_Yumesamdong%2C_North_Sikkim.jpg",
@@ -1979,14 +2078,22 @@ window.TRIPS = [
     "stay": ""
    }
   ],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "tourism",
+   "days": 6,
+   "acts": [
+    "gurudongmar",
+    "north",
+    "zeropoint"
+   ],
+   "transport": "bike"
+  }
  },
  {
   "id": "goechala",
   "kind": "trek",
   "section": "trekking",
-  "from": 30500,
-  "estimatorDays": 10,
   "title": "Goechala",
   "blurb": "Sikkim's most celebrated trek — rhododendron forest, Dzongri, Thansing and Samiti Lake to a face-to-face sunrise with Kanchenjunga.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Goechala_Trek.jpg/960px-Goechala_Trek.jpg",
@@ -2200,14 +2307,17 @@ window.TRIPS = [
     ],
     "paras": []
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "trekking",
+   "days": 10,
+   "trek": "goechala"
+  }
  },
  {
   "id": "dzongri",
   "kind": "trek",
   "section": "trekking",
-  "from": 21000,
-  "estimatorDays": 7,
   "title": "Dzongri",
   "blurb": "A shorter Goechala — oak, birch and rhododendron forest up to Dzongri Top's 360° view of the Eastern Himalayas.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Mt._Narsing_from_Dzongri_DSC04018.jpg/960px-Mt._Narsing_from_Dzongri_DSC04018.jpg",
@@ -2404,14 +2514,17 @@ window.TRIPS = [
     ],
     "paras": []
    }
-  ]
+  ],
+  "pricing": {
+   "mode": "trekking",
+   "days": 7,
+   "trek": "dzongri"
+  }
  },
  {
   "id": "singalila",
   "kind": "trek",
   "section": "trekking",
-  "from": 27500,
-  "estimatorDays": 9,
   "title": "Singalila ridge",
   "blurb": "Along the Indo-Nepal border with Everest and Kanchenjunga in view, through Barsey's rhododendrons — quiet and uncrowded.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg/960px-Mt._Kangchenjunga%2C_Singalila_Ridge_Trail_%288717542696%29.jpg",
@@ -2457,14 +2570,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 9,
+   "trek": "singalila"
+  }
  },
  {
   "id": "green-lake",
   "kind": "trek",
   "section": "trekking",
-  "from": 49500,
-  "estimatorDays": 16,
   "title": "Green Lake",
   "blurb": "Sikkim's most remote trail, from Lachen to the base of Kanchenjunga — red pandas, blue sheep and a lake that mirrors the peaks.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kangchenjunga_East_Face_from_Zemu_Glacier.jpg/960px-Kangchenjunga_East_Face_from_Zemu_Glacier.jpg",
@@ -2506,14 +2622,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 16,
+   "trek": "greenlake"
+  }
  },
  {
   "id": "kanchenjunga-base-camp",
   "kind": "trek",
   "section": "trekking",
-  "from": 33500,
-  "estimatorDays": 11,
   "title": "Kanchenjunga Base Camp",
   "blurb": "Jungles, suspension bridges and remote mountain villages to the foot of the world's third-highest mountain.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/A_scene_from_Kanchendzonga_National_Park%2C_Sikkim_%283%29.jpg/960px-A_scene_from_Kanchendzonga_National_Park%2C_Sikkim_%283%29.jpg",
@@ -2555,14 +2674,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 11,
+   "trek": "kbc"
+  }
  },
  {
   "id": "yambong-singalila",
   "kind": "trek",
   "section": "trekking",
-  "from": 30500,
-  "estimatorDays": 10,
   "title": "Yambong Singalila",
   "blurb": "A hidden gem from Nambu over remote passes and pristine valleys, with both Kanchenjunga and Makalu in view.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Morning_Light_on_Kabru_%28Kangchenjunga_Himal%29.jpg/960px-Morning_Light_on_Kabru_%28Kangchenjunga_Himal%29.jpg",
@@ -2604,14 +2726,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 10,
+   "trek": "yambong"
+  }
  },
  {
   "id": "tholung-monastery",
   "kind": "trek",
   "section": "trekking",
-  "from": 11500,
-  "estimatorDays": 4,
   "title": "Tholung Monastery",
   "blurb": "Light hiking through the remote upper Rongyong valley to one of Sikkim's holiest monasteries and its centuries-old relics.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Pathway_to_Tingvong_Monastery_located_in_Upper_Dzongu%2C_North_Sikkim%2C_India.jpg/960px-Pathway_to_Tingvong_Monastery_located_in_Upper_Dzongu%2C_North_Sikkim%2C_India.jpg",
@@ -2653,14 +2778,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 4,
+   "trek": "tholung"
+  }
  },
  {
   "id": "varsey-rhododendron",
   "kind": "trek",
   "section": "trekking",
-  "from": 11500,
-  "estimatorDays": 4,
   "title": "Varsey rhododendron",
   "blurb": "Perfect for beginners — over 40 species of rhododendron paint the forest red and pink from March to May.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Barsey_Rhododendron_Sanctuary_in_late_april.jpg/960px-Barsey_Rhododendron_Sanctuary_in_late_april.jpg",
@@ -2706,14 +2834,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 4,
+   "trek": "varsey"
+  }
  },
  {
   "id": "tosar-lake",
   "kind": "trek",
   "section": "trekking",
-  "from": 21000,
-  "estimatorDays": 7,
   "title": "Tosar Lake",
   "blurb": "An offbeat trail through dense forest and alpine plateaus to pristine Tosar Lake, facing Pandim, Kabru and Kanchenjunga.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Abhishek532_LamuneyValley.jpg/960px-Abhishek532_LamuneyValley.jpg",
@@ -2755,14 +2886,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 7,
+   "trek": "tosar"
+  }
  },
  {
   "id": "singba-rhododendron-trail",
   "kind": "trek",
   "section": "trekking",
-  "from": 14500,
-  "estimatorDays": 5,
   "title": "Rhododendron trail (Singba)",
   "blurb": "Yumthang in April–May — over 40 rhododendron varieties, orchids and rare Himalayan flora. Great for families.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Rhododendron_niveum%2C_Shingba_RS_AJT_J.jpg/960px-Rhododendron_niveum%2C_Shingba_RS_AJT_J.jpg",
@@ -2808,14 +2942,17 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 5,
+   "trek": "singba"
+  }
  },
  {
   "id": "tinjure",
   "kind": "trek",
   "section": "trekking",
-  "from": 8000,
-  "estimatorDays": 3,
   "title": "Tinjure",
   "blurb": "A quiet forest trail in Fambong Lho sanctuary, 20 km from Gangtok, to a ridge over the Teesta valley. Best October–May.",
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Log_House_at_Golitar_Fambong_Lho_WLS.jpg/960px-Log_House_at_Golitar_Fambong_Lho_WLS.jpg",
@@ -2870,6 +3007,11 @@ window.TRIPS = [
    }
   ],
   "days": [],
-  "sections": []
+  "sections": [],
+  "pricing": {
+   "mode": "trekking",
+   "days": 3,
+   "trek": "tinjure"
+  }
  }
 ];

@@ -205,88 +205,11 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="shared.js"></script>
+<script src="pricing.js"></script>
 <script src="trips.js"></script>
 <script>
   var start = new Date(); start.setDate(start.getDate() + 30);
   var state = { mode: 'tourism', origin: 'india', days: 7, people: 2, currency: loadCurrency(), stay: 'standard', acts: ['tsomgo'], comp: [], trek: 'dzongri', start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
-
-  // Sample seasonal pricing: monthly factor on stay + daily costs, weekends +15%.
-  // Seasonal pricing bands, applied per travel day. Spring peak costs more
-  // when the trip starts within CLOSE_BOOKING_DAYS of the booking date.
-  var BANDS = {
-    holiday: { f: 1.40, tag: 'Holiday peak', cls: 'festive' },
-    spring:  { f: 1.30, fClose: 1.40, tag: 'Spring peak', cls: 'peak' },
-    autumn:  { f: 1.15, tag: 'Autumn & winter', cls: 'peak' },
-    monsoon: { f: 0.80, tag: 'Monsoon', cls: 'low' },
-    quiet:   { f: 0.90, tag: 'Quiet winter', cls: 'low' }
-  };
-  var CLOSE_BOOKING_DAYS = 15;
-  var WEEKEND_FACTOR = 1.15;
-
-  function bandFor(date) {
-    var m = date.getMonth(), d = date.getDate();
-    if ((m === 11 && d >= 15) || (m === 0 && d <= 10)) return BANDS.holiday;
-    if (m >= 2 && m <= 5) return BANDS.spring;
-    if (m >= 6 && m <= 8) return BANDS.monsoon;
-    if (m >= 9 || (m === 0 && d <= 15)) return BANDS.autumn;
-    return BANDS.quiet;
-  }
-  function isCloseBooking(tripStart) {
-    var today = new Date(); today.setHours(0, 0, 0, 0);
-    return (tripStart - today) / 86400000 < CLOSE_BOOKING_DAYS;
-  }
-  function bandFactor(band, close) {
-    return close && band.fClose ? band.fClose : band.f;
-  }
-
-  var COMPANION = [
-    { id: 'plan', label: 'Plan & book', cost: 3500, perDay: false },
-    { id: 'assist', label: 'On-trip assistance', cost: 1200, perDay: true },
-    { id: 'pickup', label: 'Pickup & drop', cost: 2800, perDay: false }
-  ];
-
-  var STAYS = {
-    tourism: [
-      { id: 'homestay', label: 'Homestay', perNight: 2200 },
-      { id: 'standard', label: 'Standard hotel', perNight: 3800 },
-      { id: 'boutique', label: 'Boutique', perNight: 7000 },
-      { id: 'luxury', label: 'Luxury', perNight: 13000 }
-    ],
-    trekking: [
-      { id: 'camp-std', label: 'Standard camp', perNight: 4800 },
-      { id: 'camp-comfort', label: 'Comfort camp', perNight: 6500 },
-      { id: 'teahouse', label: 'Teahouse mix', perNight: 4000 }
-    ]
-  };
-
-  var ACTS = {
-    tourism: [
-      { id: 'tsomgo', label: 'Tsomgo Lake (1 day)', cost: 3500, days: 1 },
-      { id: 'nathula', label: 'Nathula Pass (with Tsomgo)', cost: 2500, days: 0, indiaOnly: true, requires: 'tsomgo' },
-      { id: 'north', label: 'Lachung–Yumthang (2 days)', cost: 8000, days: 2 },
-      { id: 'gurudongmar', label: 'Lachen & Gurudongmar Lake (2 days)', cost: 9000, days: 2 },
-      { id: 'zeropoint', label: 'Zero Point (from Lachung)', cost: 3000, days: 0, requires: 'north' },
-      { id: 'silkroute', label: 'Silk Route: Zuluk & Nathang (2 days)', cost: 9000, days: 2 },
-      { id: 'south', label: 'South Sikkim: Namchi & Ravangla (1 day)', cost: 4500, days: 1 },
-      { id: 'pelling', label: 'Pelling & West Sikkim (2 days)', cost: 4000, days: 2 },
-      { id: 'darjeeling', label: 'Darjeeling: Tiger Hill & toy train (2 days)', cost: 5500, days: 2 },
-      { id: 'monasteries', label: 'Monastery circuit (half day)', cost: 1500, days: 0.5 },
-      { id: 'cablecar', label: 'Cable car & city (half day)', cost: 800, days: 0.5 },
-      { id: 'rafting', label: 'Teesta rafting (half day)', cost: 1800, days: 0.5 }
-    ],
-    trekking: [
-      { id: 'gear', label: 'Gear rental', cost: 2500 },
-      { id: 'porter', label: 'Personal porter', cost: 4500 },
-      { id: 'acclim', label: 'Extra acclimatisation day', cost: 5200 },
-      { id: 'darjeeling', label: 'Darjeeling extension', cost: 6000 }
-    ],
-    alacarte: [
-      { id: 'cab', label: 'Cab — pickup & drop', cost: 2800, perVehicle: true },
-      { id: 'nathula', label: 'Day tour: Nathula Pass', cost: 4500, perPerson: true, group: 'tour', indiaOnly: true },
-      { id: 'south', label: 'Day tour: South Sikkim', cost: 3200, perPerson: true, group: 'tour' }
-    ]
-  };
-  var CAB_SEATS = 4; // sample: one cab carries up to 4
 
   // Lachen–Gurudongmar and Lachung–Yumthang share a day: Gangtok → Lachen,
   // Lachen → Gurudongmar → Lachung, Lachung → Yumthang → Gangtok.
@@ -324,24 +247,6 @@
     return removed;
   }
 
-  var TREKS = [
-    { id: 'goechala', label: 'Goechala', days: 10 },
-    { id: 'dzongri', label: 'Dzongri', days: 7 },
-    { id: 'singalila', label: 'Singalila ridge', days: 9 },
-    { id: 'greenlake', label: 'Green Lake', days: 16 },
-    { id: 'kbc', label: 'Kanchenjunga Base Camp', days: 11 },
-    { id: 'yambong', label: 'Yambong Singalila', days: 10 },
-    { id: 'tholung', label: 'Tholung Monastery', days: 4 },
-    { id: 'varsey', label: 'Varsey rhododendron', days: 4 },
-    { id: 'tosar', label: 'Tosar Lake', days: 7 },
-    { id: 'singba', label: 'Rhododendron trail (Singba)', days: 5 },
-    { id: 'tinjure', label: 'Tinjure', days: 3 }
-  ];
-
-  // Sample per-person daily cost for shared transport and meals (tourism only;
-  // trek packages already include food and crew).
-  var TRANSPORT_FOOD_PER_DAY = 1800;
-  var PERMITS = { tourism: { india: 500, abroad: 2500 }, trekking: { india: 1500, abroad: 4500 } };
   function renderTripCards() {
     [['tourism', 'tour-cards'], ['trekking', 'trek-cards']].forEach(function (pair) {
       var box = document.getElementById(pair[1]);
@@ -352,96 +257,12 @@
     });
   }
 
-  function tripDates() {
-    var ds = [];
-    for (var i = 0; i < state.days; i++) {
-      var d = new Date(state.start); d.setDate(d.getDate() + i); ds.push(d);
-    }
-    return ds;
-  }
-
-  function seasonInfo() {
-    var ds = tripDates(), sum = 0, weekends = 0, tags = [], closeHit = false;
-    var close = isCloseBooking(state.start);
-    ds.forEach(function (d) {
-      var we = d.getDay() === 0 || d.getDay() === 6;
-      if (we) weekends++;
-      var band = bandFor(d);
-      if (tags.indexOf(band.tag) === -1) tags.push(band.tag);
-      if (close && band.fClose) closeHit = true;
-      sum += bandFactor(band, close) * (we ? WEEKEND_FACTOR : 1);
-    });
-    var tag = tags.join(' → ') + (closeHit ? ', booked within ' + CLOSE_BOOKING_DAYS + ' days' : '');
-    return { factor: sum / ds.length, weekends: weekends, tag: tag };
-  }
-
   function lines() {
-    if (state.mode === 'alacarte') {
-      var out2 = [], varSum = 0;
-      state.acts.forEach(function (id) {
-        var a = ACTS.alacarte.find(function (x) { return x.id === id; });
-        if (!a) return;
-        var amt, label = a.label;
-        if (a.perVehicle) {
-          var cabs = Math.ceil(state.people / CAB_SEATS);
-          amt = a.cost * cabs;
-          label += ' (' + cabs + ' cab' + (cabs > 1 ? 's' : '') + ', up to ' + CAB_SEATS + ' seats each)';
-        } else {
-          amt = a.cost * state.people;
-          label += ' × ' + state.people + (a.indiaOnly ? ' (permit included)' : '');
-        }
-        varSum += amt;
-        out2.push({ label: label, inr: amt });
-      });
-      var si2 = seasonInfo();
-      var adj2 = Math.round((si2.factor - 1) * varSum);
-      if (adj2 !== 0 && varSum > 0) {
-        out2.push({
-          label: 'Season & weekend (' + si2.tag + (si2.weekends ? ', weekend day' : '') + ')',
-          inr: adj2, signed: true
-        });
-      }
-      return out2;
-    }
-    var stays = STAYS[state.mode], acts = ACTS[state.mode];
-    var stay = stays.find(function (s) { return s.id === state.stay; }) || stays[0];
-    var nights = Math.max(state.days - 1, 1);
-    var pax = state.people;
-    var perPax = pax > 1 ? ' × ' + pax + ' people' : '';
-    var out = [];
-    var variable = stay.perNight * nights * pax;
-    out.push({ label: stay.label + ' × ' + nights + ' nights' + perPax, inr: variable });
-    if (state.mode === 'tourism') {
-      var tf = TRANSPORT_FOOD_PER_DAY * state.days * pax;
-      variable += tf;
-      out.push({ label: 'Shared transport & meals × ' + state.days + ' days' + perPax, inr: tf });
-    } else {
-      var trek = TREKS.find(function (t) { return t.id === state.trek; });
-      out.push({ label: (trek ? trek.label + ' — ' : '') + 'guide, crew & meals (in package)', inr: 0 });
-    }
-    var si = seasonInfo();
-    var adj = Math.round((si.factor - 1) * variable);
-    if (adj !== 0) {
-      out.push({
-        label: 'Season & weekends (' + si.tag + (si.weekends ? ', ' + si.weekends + ' weekend day' + (si.weekends > 1 ? 's' : '') : '') + ')',
-        inr: adj, signed: true
-      });
-    }
-    state.acts.forEach(function (id) {
-      var a = acts.find(function (x) { return x.id === id; });
-      if (a) out.push({ label: a.label + perPax, inr: a.cost * pax });
+    return estimate({
+      mode: state.mode, days: state.mode === 'alacarte' ? 1 : state.days, pax: state.people,
+      stay: state.stay, acts: state.acts, comp: state.comp, trek: state.trek,
+      origin: state.origin, start: state.start
     });
-    if (state.mode === 'tourism') {
-      state.comp.forEach(function (id) {
-        var c = COMPANION.find(function (x) { return x.id === id; });
-        if (c) out.push({
-          label: 'Sathi: ' + c.label + (c.perDay ? ' × ' + state.days + ' days' : '') + (pax > 1 ? ' (whole group)' : ''),
-          inr: c.perDay ? c.cost * state.days : c.cost
-        });
-      });
-    }
-    out.push({ label: 'Permits & fees (' + (state.origin === 'india' ? 'Indian national' : 'foreign national') + ')' + perPax, inr: PERMITS[state.mode][state.origin] * pax });
-    return out;
   }
 
   function render() {
@@ -486,7 +307,7 @@
     ACTS[state.mode].forEach(function (a) {
       var b = document.createElement('button');
       b.textContent = alc
-        ? a.label + ' · from ' + fmtExact(a.cost, state.currency) + (a.perVehicle ? '/cab' : '/person')
+        ? a.label + ' · from ' + [a.perVehicle ? fmtExact(a.perVehicle, state.currency) + '/car' : '', a.perPerson ? fmtExact(a.perPerson, state.currency) + '/person' : ''].filter(Boolean).join(' + ')
         : a.label;
       var blocked = a.indiaOnly && state.origin === 'abroad';
       if (blocked) {

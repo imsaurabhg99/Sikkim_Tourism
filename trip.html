@@ -103,6 +103,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="shared.js"></script>
+<script src="pricing.js"></script>
 <script src="trips.js"></script>
 <script>
   var currency = loadCurrency();
@@ -120,10 +121,11 @@
     var box = document.getElementById('price');
     box.innerHTML = '';
     box.appendChild(document.createTextNode('From '));
-    box.appendChild(el('b', null, fmtFrom(trip.from, currency)));
+    var from = startingPrice(trip);
+    box.appendChild(el('b', null, fmtFrom(from, currency)));
     var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== currency; })
-      .map(function (c) { return '≈ ' + fmtFrom(trip.from, c); }).join(' · ');
-    box.appendChild(document.createTextNode(' per person · ' + others));
+      .map(function (c) { return '≈ ' + fmtFrom(from, c); }).join(' · ');
+    box.appendChild(document.createTextNode(' per person, 2 sharing · ' + others));
     document.querySelectorAll('.currency button').forEach(function (b) {
       b.classList.toggle('active', b.dataset.cur === currency);
     });
