@@ -58,9 +58,9 @@ function buildTripCard(trip, cur) {
   var foot = document.createElement('div'); foot.className = 'card-foot';
   var price = document.createElement('span'); price.className = 'from';
   price.appendChild(document.createTextNode('From '));
-  var b = document.createElement('b'); b.textContent = fmtFrom(trip.from, cur);
+  var b = document.createElement('b'); b.textContent = fmtFrom(startingPrice(trip), cur);
   price.appendChild(b);
-  price.appendChild(document.createTextNode(' per person'));
+  price.appendChild(document.createTextNode(' per person, 2 sharing'));
   var more = document.createElement('span'); more.className = 'more';
   more.textContent = trip.days.length ? 'Day-wise itinerary →' : 'View details →';
   foot.appendChild(price); foot.appendChild(more);
