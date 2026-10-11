@@ -121,15 +121,19 @@
   .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
   .cal-head button { border: 1.5px solid var(--line); background: transparent; border-radius: 999px; width: 28px; height: 28px; font-size: 15px; line-height: 1; color: var(--ink); }
   .cal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 15px; }
-  .cal-season { font-size: 12px; font-weight: 600; margin: 2px 0 8px 0; display: flex; gap: 8px; align-items: center; }
+  .cal-season { font-size: 11.5px; font-weight: 600; margin: 2px 0 8px 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .cal-season .badge { border-radius: 999px; padding: 3px 10px; background: var(--chip); }
   .cal-season .badge.peak { background: #fbe3d6; color: #a33f12; }
+  .cal-season .badge.festive { background: #f6c7ad; color: #8a2f08; }
   .cal-season .badge.low { background: #e2f0e6; color: #23663a; }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
   .cal-grid .dow { font-size: 10.5px; font-weight: 600; color: var(--muted); text-align: center; padding: 4px 0; letter-spacing: 0.05em; }
-  .cal-grid .dow.we, .cal-grid button.we { color: #a33f12; }
+  .cal-grid .dow.we { color: #a33f12; }
   .cal-grid button { border: 0; background: transparent; border-radius: 9px; font-size: 13px; padding: 7px 0; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .cal-grid button.we { background: #fdf1e9; }
+  .cal-grid button.s-peak { background: #fdf1e9; }
+  .cal-grid button.s-festive { background: #f9d9c6; }
+  .cal-grid button.s-low { background: #eef6f0; }
+  .cal-grid button.we { font-weight: 700; color: #a33f12; }
   .cal-grid button:hover { outline: 1.5px solid var(--night); }
   .cal-grid button.sel { background: var(--night); color: var(--cream); }
   .cal-grid button:disabled { color: #c9c6bd; background: transparent; }
@@ -426,15 +430,33 @@
   var state = { mode: 'tourism', origin: 'india', days: 7, people: 2, currency: 'INR', stay: 'standard', acts: ['tsomgo'], comp: [], start: start, calMonth: new Date(start.getFullYear(), start.getMonth(), 1) };
 
   // Sample seasonal pricing: monthly factor on stay + daily costs, weekends +15%.
-  var SEASON = [
-    { f: 0.90, tag: 'Quiet winter', cls: 'low' },  { f: 0.90, tag: 'Quiet winter', cls: 'low' },
-    { f: 1.10, tag: 'Rhododendron spring', cls: '' }, { f: 1.15, tag: 'Spring peak', cls: 'peak' },
-    { f: 1.10, tag: 'Late spring', cls: '' },      { f: 0.85, tag: 'Monsoon', cls: 'low' },
-    { f: 0.80, tag: 'Monsoon', cls: 'low' },       { f: 0.80, tag: 'Monsoon', cls: 'low' },
-    { f: 1.00, tag: 'Clearing skies', cls: '' },   { f: 1.25, tag: 'Autumn peak', cls: 'peak' },
-    { f: 1.20, tag: 'Autumn peak', cls: 'peak' },  { f: 1.10, tag: 'Festive winter', cls: '' }
-  ];
+  // Seasonal pricing bands, applied per travel day. Spring peak costs more
+  // when the trip starts within CLOSE_BOOKING_DAYS of the booking date.
+  var BANDS = {
+    holiday: { f: 1.40, tag: 'Holiday peak', cls: 'festive' },
+    spring:  { f: 1.30, fClose: 1.40, tag: 'Spring peak', cls: 'peak' },
+    autumn:  { f: 1.15, tag: 'Autumn & winter', cls: 'peak' },
+    monsoon: { f: 0.80, tag: 'Monsoon', cls: 'low' },
+    quiet:   { f: 0.90, tag: 'Quiet winter', cls: 'low' }
+  };
+  var CLOSE_BOOKING_DAYS = 15;
   var WEEKEND_FACTOR = 1.15;
+
+  function bandFor(date) {
+    var m = date.getMonth(), d = date.getDate();
+    if ((m === 11 && d >= 15) || (m === 0 && d <= 10)) return BANDS.holiday;
+    if (m >= 2 && m <= 5) return BANDS.spring;
+    if (m >= 6 && m <= 8) return BANDS.monsoon;
+    if (m >= 9 || (m === 0 && d <= 15)) return BANDS.autumn;
+    return BANDS.quiet;
+  }
+  function isCloseBooking(tripStart) {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    return (tripStart - today) / 86400000 < CLOSE_BOOKING_DAYS;
+  }
+  function bandFactor(band, close) {
+    return close && band.fClose ? band.fClose : band.f;
+  }
 
   var COMPANION = [
     { id: 'plan', label: 'Plan & book', cost: 3500, perDay: false },
@@ -504,13 +526,18 @@
   }
 
   function seasonInfo() {
-    var ds = tripDates(), sum = 0, weekends = 0;
+    var ds = tripDates(), sum = 0, weekends = 0, tags = [], closeHit = false;
+    var close = isCloseBooking(state.start);
     ds.forEach(function (d) {
       var we = d.getDay() === 0 || d.getDay() === 6;
       if (we) weekends++;
-      sum += SEASON[d.getMonth()].f * (we ? WEEKEND_FACTOR : 1);
+      var band = bandFor(d);
+      if (tags.indexOf(band.tag) === -1) tags.push(band.tag);
+      if (close && band.fClose) closeHit = true;
+      sum += bandFactor(band, close) * (we ? WEEKEND_FACTOR : 1);
     });
-    return { factor: sum / ds.length, weekends: weekends, tag: SEASON[state.start.getMonth()].tag };
+    var tag = tags.join(' → ') + (closeHit ? ', booked within ' + CLOSE_BOOKING_DAYS + ' days' : '');
+    return { factor: sum / ds.length, weekends: weekends, tag: tag };
   }
 
   function lines() {
@@ -752,8 +779,8 @@
     cal.hidden = !calOpen;
     if (!calOpen) return;
     var y = state.calMonth.getFullYear(), m = state.calMonth.getMonth();
-    var season = SEASON[m];
     var today = new Date(); today.setHours(0, 0, 0, 0);
+    var daysIn = new Date(y, m + 1, 0).getDate();
     cal.innerHTML = '';
 
     var head = document.createElement('div'); head.className = 'cal-head';
@@ -766,11 +793,21 @@
     cal.appendChild(head);
 
     var badge = document.createElement('div'); badge.className = 'cal-season';
-    var b1 = document.createElement('span'); b1.className = 'badge ' + season.cls; b1.textContent = season.tag;
-    var b2 = document.createElement('span'); b2.style.color = '#8a8894';
-    var pct = Math.round((season.f - 1) * 100);
-    b2.textContent = (pct === 0 ? 'base rates' : (pct > 0 ? '+' + pct + '%' : pct + '%') + ' vs base');
-    badge.appendChild(b1); badge.appendChild(b2);
+    var runs = [];
+    for (var dd = 1; dd <= daysIn; dd++) {
+      var bd = bandFor(new Date(y, m, dd));
+      var last = runs[runs.length - 1];
+      if (last && last.band === bd) last.to = dd; else runs.push({ band: bd, from: dd, to: dd });
+    }
+    runs.forEach(function (r) {
+      var b = document.createElement('span'); b.className = 'badge ' + r.band.cls;
+      var pct = Math.round((r.band.f - 1) * 100);
+      var txt = r.band.tag + ' ' + (pct > 0 ? '+' : '−') + Math.abs(pct) + '%';
+      if (r.band.fClose) txt += ' (+' + Math.round((r.band.fClose - 1) * 100) + '% if booked late)';
+      if (runs.length > 1) txt += ' · ' + r.from + '–' + r.to;
+      b.textContent = txt;
+      badge.appendChild(b);
+    });
     cal.appendChild(badge);
 
     var grid = document.createElement('div'); grid.className = 'cal-grid';
@@ -781,14 +818,17 @@
     var first = new Date(y, m, 1);
     var lead = (first.getDay() + 6) % 7; // Monday-first offset
     for (var i = 0; i < lead; i++) grid.appendChild(document.createElement('span'));
-    var daysIn = new Date(y, m + 1, 0).getDate();
     for (var d = 1; d <= daysIn; d++) {
       (function (d) {
         var date = new Date(y, m, d);
         var b = document.createElement('button');
         b.textContent = d;
+        var band = bandFor(date);
+        b.classList.add('s-' + band.cls);
         var we = date.getDay() === 0 || date.getDay() === 6;
         if (we) b.classList.add('we');
+        var pctDay = Math.round((bandFactor(band, isCloseBooking(date)) * (we ? WEEKEND_FACTOR : 1) - 1) * 100);
+        b.title = band.tag + (we ? ' + weekend' : '') + ': ' + (pctDay >= 0 ? '+' : '−') + Math.abs(pctDay) + '%';
         if (sameDay(date, state.start)) b.classList.add('sel');
         if (date < today) b.disabled = true;
         b.onclick = function () { state.start = date; calOpen = false; render(); };
@@ -798,7 +838,8 @@
     cal.appendChild(grid);
 
     var foot = document.createElement('div'); foot.className = 'cal-foot';
-    foot.textContent = 'Weekend days (tinted) cost about 15% more. Monthly rates vary by season.';
+    foot.textContent = 'Shading shows the season: orange costs more, green costs less. Weekends (bold) add about 15%.'
+      + (m >= 2 && m <= 5 ? ' Spring trips starting within ' + CLOSE_BOOKING_DAYS + ' days of booking cost +40% instead of +30%.' : '');
     cal.appendChild(foot);
   }
 
