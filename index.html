@@ -66,8 +66,8 @@
             <button id="days-plus" aria-label="More days">+</button>
           </div>
         </div>
-        <div class="field" id="people-field" style="display: none;">
-          <span class="lbl">INDIVIDUALS</span>
+        <div class="field" id="people-field">
+          <span class="lbl">TRAVELLERS (PAX)</span>
           <div class="stepper">
             <button id="people-minus" aria-label="Fewer people">−</button>
             <span class="num" id="people-num">2 people</span>
@@ -103,7 +103,7 @@
       <div class="est-foot">
         <div class="est-total">
           <span class="num" id="est-range">—</span>
-          <span class="sub" id="est-sub">per person</span>
+          <span class="sub" id="est-sub">for 2 people</span>
         </div>
         <button class="breakdown-toggle" id="bd-toggle">See the breakdown ▸</button>
         <button class="cta" id="cta">Get my estimate →</button>
@@ -370,13 +370,15 @@
     var stays = STAYS[state.mode], acts = ACTS[state.mode];
     var stay = stays.find(function (s) { return s.id === state.stay; }) || stays[0];
     var nights = Math.max(state.days - 1, 1);
+    var pax = state.people;
+    var perPax = pax > 1 ? ' × ' + pax + ' people' : '';
     var out = [];
-    var variable = stay.perNight * nights;
-    out.push({ label: stay.label + ' × ' + nights + ' nights', inr: variable });
+    var variable = stay.perNight * nights * pax;
+    out.push({ label: stay.label + ' × ' + nights + ' nights' + perPax, inr: variable });
     if (state.mode === 'tourism') {
-      var tf = TRANSPORT_FOOD_PER_DAY * state.days;
+      var tf = TRANSPORT_FOOD_PER_DAY * state.days * pax;
       variable += tf;
-      out.push({ label: 'Shared transport & meals × ' + state.days + ' days', inr: tf });
+      out.push({ label: 'Shared transport & meals × ' + state.days + ' days' + perPax, inr: tf });
     } else {
       var trek = TREKS.find(function (t) { return t.id === state.trek; });
       out.push({ label: (trek ? trek.label + ' — ' : '') + 'guide, crew & meals (in package)', inr: 0 });
@@ -391,18 +393,18 @@
     }
     state.acts.forEach(function (id) {
       var a = acts.find(function (x) { return x.id === id; });
-      if (a) out.push({ label: a.label, inr: a.cost });
+      if (a) out.push({ label: a.label + perPax, inr: a.cost * pax });
     });
     if (state.mode === 'tourism') {
       state.comp.forEach(function (id) {
         var c = COMPANION.find(function (x) { return x.id === id; });
         if (c) out.push({
-          label: 'Sathi: ' + c.label + (c.perDay ? ' × ' + state.days + ' days' : ''),
+          label: 'Sathi: ' + c.label + (c.perDay ? ' × ' + state.days + ' days' : '') + (pax > 1 ? ' (whole group)' : ''),
           inr: c.perDay ? c.cost * state.days : c.cost
         });
       });
     }
-    out.push({ label: 'Permits & fees (' + (state.origin === 'india' ? 'Indian national' : 'foreign national') + ')', inr: PERMITS[state.mode][state.origin] });
+    out.push({ label: 'Permits & fees (' + (state.origin === 'india' ? 'Indian national' : 'foreign national') + ')' + perPax, inr: PERMITS[state.mode][state.origin] * pax });
     return out;
   }
 
@@ -415,8 +417,8 @@
 
     var alc = state.mode === 'alacarte';
     document.getElementById('days-field').style.display = alc ? 'none' : '';
-    document.getElementById('people-field').style.display = alc ? '' : 'none';
     document.getElementById('stay-field').style.display = alc ? 'none' : '';
+    document.getElementById('stay-field').style.gridColumn = state.mode === 'trekking' ? '1 / -1' : '';
     var trekField = document.getElementById('trek-field');
     trekField.style.display = state.mode === 'trekking' ? '' : 'none';
     var trekBox = document.getElementById('trek-opts');
@@ -477,6 +479,7 @@
     if (state.mode === 'tourism') {
       actField.style.gridColumn = 'span 2';
       compField.style.display = '';
+      compField.style.gridColumn = '1 / -1';
       var compBox = document.getElementById('comp-opts');
       compBox.innerHTML = '';
       COMPANION.forEach(function (c) {
@@ -510,9 +513,10 @@
       ? state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
       : state.start.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + end.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     var others = ['INR', 'USD', 'EUR'].filter(function (c) { return c !== state.currency; })
-      .map(function (c) { return '≈ ' + fmtFrom(total, c); }).join(' · ');
-    var basis = alc ? 'for ' + state.people + (state.people > 1 ? ' people' : ' person') : 'per person';
-    document.getElementById('est-sub').textContent = range + ' · ' + basis + ' · ' + others;
+      .map(function (c) { return fmtFrom(total, c); }).join(' · ');
+    var basis = 'for ' + state.people + (state.people > 1 ? ' people' : ' person') + ' (≈ ' + others + ')'
+      + (state.people > 1 ? ' · from ' + fmtFrom(total / state.people, state.currency) + ' per person' : '');
+    document.getElementById('est-sub').textContent = range + ' · ' + basis;
 
     var table = document.getElementById('bd-table');
     table.innerHTML = '';
@@ -560,7 +564,7 @@
   document.getElementById('days-minus').onclick = function () { state.days = Math.max(2, state.days - 1); render(); };
   document.getElementById('days-plus').onclick = function () { state.days = Math.min(21, state.days + 1); render(); };
   document.getElementById('people-minus').onclick = function () { state.people = Math.max(1, state.people - 1); render(); };
-  document.getElementById('people-plus').onclick = function () { state.people = Math.min(16, state.people + 1); render(); };
+  document.getElementById('people-plus').onclick = function () { state.people = Math.min(30, state.people + 1); render(); };
   document.getElementById('bd-toggle').onclick = function () {
     var bd = document.getElementById('breakdown');
     bd.classList.toggle('open');
